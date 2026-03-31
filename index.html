@@ -37,7 +37,7 @@
           <span class="text-3xl">🔧</span>
           <div class="flex-1 min-w-0">
             <p id="sidebarNamaBengkel" class="text-white font-bold text-lg leading-tight truncate cursor-pointer hover:text-white/80" onclick="openSettingNama()" title="Klik untuk ubah nama">Bengkel</p>
-            <p class="text-white/50 text-xs">Sparepart Manager</p>
+            <p class="text-white/75 text-xs">Sparepart Manager</p>
           </div>
         </div>
       </div>
@@ -105,7 +105,7 @@
           </div>
         </div>
         <!-- Summary mini -->
-        <div class="hidden sm:flex items-center gap-4 text-xs text-white/60">
+        <div class="hidden sm:flex items-center gap-4 text-xs text-white/80">
           <span>📦 <span id="sumJenisBarang" class="text-white font-bold">0</span> jenis</span>
           <span>📥 <span id="sumUnitMasuk" class="text-emerald-300 font-bold">0</span> masuk</span>
           <span>📤 <span id="sumUnitKeluar" class="text-red-300 font-bold">0</span> keluar</span>
@@ -126,14 +126,14 @@
         <!-- Summary Cards (hanya tampil di stok) -->
         <div id="summaryCards" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
-            <p class="text-white/50 text-xs uppercase tracking-wider mb-1">Total Barang</p>
+            <p class="text-white/80 text-xs uppercase tracking-wider mb-1">Total Barang</p>
             <p id="sumJenisBarang2" class="text-white text-2xl font-bold">0</p>
-            <p class="text-white/40 text-xs mt-1">jenis</p>
+            <p class="text-white/70 text-xs mt-1">jenis</p>
           </div>
           <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
-            <p class="text-white/50 text-xs uppercase tracking-wider mb-1">Stok Tersedia</p>
+            <p class="text-white/80 text-xs uppercase tracking-wider mb-1">Stok Tersedia</p>
             <p id="sumStokTotal" class="text-white text-2xl font-bold">0</p>
-            <p class="text-white/40 text-xs mt-1">unit</p>
+            <p class="text-white/70 text-xs mt-1">unit</p>
           </div>
           <div class="bg-emerald-500/20 border border-emerald-400/30 rounded-2xl p-4 text-center">
             <p class="text-emerald-300/70 text-xs uppercase tracking-wider mb-1">Total Masuk</p>
@@ -149,7 +149,7 @@
 
         <!-- Form Tambah Barang -->
         <div id="formBarang" class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5">
-          <p class="text-white/60 text-xs uppercase tracking-wider mb-3">Tambah Barang Baru</p>
+          <p class="text-white/80 text-xs uppercase tracking-wider mb-3">Tambah Barang Baru</p>
           <div class="flex flex-col sm:flex-row gap-3">
             <input type="text" id="nama" placeholder="Nama Barang"
               class="flex-1 bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition">
@@ -187,7 +187,7 @@
               <div>
                 <p class="text-white/50 text-xs uppercase tracking-wider">Total Barang</p>
                 <p id="dbTotalBarang" class="text-white text-2xl font-bold">0</p>
-                <p class="text-white/40 text-xs">jenis</p>
+                <p class="text-white/70 text-xs">jenis</p>
               </div>
             </div>
             <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5 flex items-center gap-4">
@@ -195,7 +195,7 @@
               <div>
                 <p class="text-white/50 text-xs uppercase tracking-wider">Total Stok</p>
                 <p id="dbTotalStok" class="text-white text-2xl font-bold">0</p>
-                <p class="text-white/40 text-xs">unit</p>
+                <p class="text-white/70 text-xs">unit</p>
               </div>
             </div>
             <div class="backdrop-blur-xl bg-emerald-500/20 border border-emerald-400/30 rounded-2xl p-5 flex items-center gap-4">
@@ -248,7 +248,7 @@
                 <span class="text-lg">⚠️</span>
                 <div>
                   <p class="text-white font-semibold">Stok Kritis</p>
-                  <p class="text-white/40 text-xs">Barang dengan stok ≤ 3</p>
+                  <p class="text-white/70 text-xs">Barang dengan stok ≤ 3</p>
                 </div>
               </div>
               <div id="dbStokKritis" class="space-y-2"></div>
@@ -260,7 +260,7 @@
               <div class="flex items-center justify-between mb-4">
                 <div>
                   <p class="text-white font-semibold">Transaksi Terakhir</p>
-                  <p class="text-white/40 text-xs">5 aktivitas terbaru</p>
+                  <p class="text-white/70 text-xs">5 aktivitas terbaru</p>
                 </div>
                 <button onclick="switchTab('riwayat')" class="text-white/40 hover:text-white text-xs transition cursor-pointer">Lihat semua →</button>
               </div>
@@ -303,7 +303,7 @@
         <!-- Panel: Kelola Jasa -->
         <div id="panelJasa" class="hidden space-y-4">
           <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5">
-            <p class="text-white/60 text-xs uppercase tracking-wider mb-3">Tambah Jasa Baru</p>
+            <p class="text-white/80 text-xs uppercase tracking-wider mb-3">Tambah Jasa Baru</p>
             <div class="flex flex-col sm:flex-row gap-3">
               <input type="text" id="jasaNama" placeholder="Nama Jasa (cth: Ganti Oli, Tune Up)"
                 class="flex-1 bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition">
@@ -337,7 +337,7 @@
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div class="flex flex-col gap-4">
               <div>
-                <p class="text-white/60 text-xs uppercase tracking-wider mb-2">Pilih Sparepart</p>
+                <p class="text-white/80 text-xs uppercase tracking-wider mb-2">Pilih Sparepart</p>
                 <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
                   <div class="p-3 border-b border-white/10">
                     <input type="text" id="kasirCari" placeholder="Cari barang..." oninput="renderKasirPilih()"
@@ -348,7 +348,7 @@
                 </div>
               </div>
               <div>
-                <p class="text-white/60 text-xs uppercase tracking-wider mb-2">Pilih Jasa</p>
+                <p class="text-white/80 text-xs uppercase tracking-wider mb-2">Pilih Jasa</p>
                 <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
                   <div id="kasirListJasa" class="max-h-48 overflow-y-auto divide-y divide-white/10"></div>
                   <div id="kasirEmptyJasa" class="py-6 text-center text-white/40 text-sm">Belum ada jasa tersedia</div>
@@ -497,7 +497,7 @@
           <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
             <div class="p-4 border-b border-white/10">
               <p class="text-white font-semibold">Detail Transaksi</p>
-              <p id="lapPeriodeLabel" class="text-white/40 text-xs mt-1">Hari ini</p>
+              <p id="lapPeriodeLabel" class="text-white/70 text-xs mt-1">Hari ini</p>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-sm text-white">
@@ -592,7 +592,7 @@
       <div class="text-center mb-6">
         <span class="text-5xl">🗑️</span>
         <h2 id="hapusRiwayatJudul" class="text-white text-xl font-bold mt-3 mb-1">Hapus Riwayat?</h2>
-        <p id="hapusRiwayatSub" class="text-white/50 text-sm">Tindakan ini tidak bisa dibatalkan.</p>
+        <p id="hapusRiwayatSub" class="text-white/75 text-sm">Tindakan ini tidak bisa dibatalkan.</p>
       </div>
       <input type="hidden" id="hapusRiwayatIndex">
       <div class="flex gap-3">
@@ -627,7 +627,7 @@
       <div class="text-center mb-6">
         <span class="text-5xl">🗑️</span>
         <h2 class="text-white text-xl font-bold mt-3 mb-1">Hapus Barang?</h2>
-        <p class="text-white/50 text-sm">Barang <span id="hapusNama" class="text-white font-semibold"></span> akan dihapus permanen.</p>
+        <p class="text-white/75 text-sm">Barang <span id="hapusNama" class="text-white font-semibold"></span> akan dihapus permanen.</p>
       </div>
       <input type="hidden" id="hapusIndex">
       <div class="flex gap-3">
@@ -673,7 +673,7 @@
           <input type="number" id="modalHarga" placeholder="Harga satuan" min="0"
             class="w-full bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition"></div>
         <div class="bg-white/10 rounded-xl px-4 py-3 flex justify-between items-center">
-          <span class="text-white/50 text-sm">Total</span>
+          <span class="text-white/75 text-sm">Total</span>
           <span id="modalTotal" class="text-white font-bold">Rp 0</span>
         </div>
         <div><label class="text-white/80 text-xs uppercase tracking-wider mb-1 block font-medium">Keterangan</label>
