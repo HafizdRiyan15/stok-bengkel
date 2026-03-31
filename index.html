@@ -84,6 +84,10 @@
           <span class="text-lg">📂</span> Import Backup
           <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
         </label>
+        <button onclick="document.getElementById('modalPanduan').classList.remove('hidden')"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition cursor-pointer text-white/70 hover:bg-white/10">
+          <span class="text-lg">❓</span> Panduan Penggunaan
+        </button>
       </div>
     </aside>
 
@@ -695,6 +699,84 @@
       <div class="flex gap-3 mt-6">
         <button onclick="closeModal()" class="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Batal</button>
         <button id="modalConfirm" onclick="konfirmasiTransaksi()" class="flex-1 py-3 rounded-xl font-semibold transition cursor-pointer">Konfirmasi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Panduan -->
+  <div id="modalPanduan" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-indigo-900/90 backdrop-blur-xl border border-white/30 rounded-3xl w-full max-w-lg shadow-2xl mx-4 overflow-y-auto max-h-[90vh]">
+      <div class="p-6 border-b border-white/15 flex items-center justify-between">
+        <div>
+          <h2 class="text-white text-xl font-bold">❓ Panduan Penggunaan</h2>
+          <p class="text-white/60 text-xs mt-1">Stok Sparepart Bengkel</p>
+        </div>
+        <button onclick="document.getElementById('modalPanduan').classList.add('hidden')"
+          class="text-white/40 hover:text-white text-2xl leading-none cursor-pointer">×</button>
+      </div>
+      <div class="p-6 space-y-5 text-sm text-white/80">
+
+        <div class="space-y-2">
+          <p class="text-white font-semibold flex items-center gap-2">📦 Stok Barang</p>
+          <ul class="space-y-1 text-white/70 pl-4 list-disc">
+            <li>Tambah barang baru dengan isi nama, stok awal, harga beli, harga jual</li>
+            <li>Pilih kategori masuk: Stok Awal, Pembelian, atau Lainnya</li>
+            <li>Tombol <span class="text-emerald-300 font-semibold">+ Masuk</span> untuk tambah stok barang yang sudah ada</li>
+            <li>Tombol <span class="text-red-300 font-semibold">− Keluar</span> untuk kurangi stok secara manual</li>
+            <li>Tombol <span class="text-blue-300 font-semibold">Ubah</span> untuk edit nama, stok, atau harga</li>
+            <li>Harga beli otomatis dihitung rata-rata saat ada pemasukan baru</li>
+          </ul>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-white font-semibold flex items-center gap-2">⚙️ Kelola Jasa</p>
+          <ul class="space-y-1 text-white/70 pl-4 list-disc">
+            <li>Tambah daftar jasa bengkel beserta tarifnya (contoh: Ganti Oli, Tune Up)</li>
+            <li>Jasa tidak punya stok, hanya nama dan tarif</li>
+            <li>Jasa bisa dipilih saat proses transaksi di Kasir</li>
+          </ul>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-white font-semibold flex items-center gap-2">🛒 Kasir</p>
+          <ul class="space-y-1 text-white/70 pl-4 list-disc">
+            <li>Pilih sparepart dan jasa yang dibutuhkan pelanggan</li>
+            <li>Gunakan tombol +/− untuk atur jumlah di keranjang</li>
+            <li>Isi nama pelanggan (opsional)</li>
+            <li>Klik <span class="text-emerald-300 font-semibold">Proses Transaksi</span> untuk selesaikan dan cetak nota</li>
+            <li>Stok otomatis berkurang setelah transaksi diproses</li>
+          </ul>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-white font-semibold flex items-center gap-2">📊 Laporan</p>
+          <ul class="space-y-1 text-white/70 pl-4 list-disc">
+            <li>Lihat rekap pemasukan, pengeluaran, pendapatan jasa, dan keuntungan kotor</li>
+            <li>Filter berdasarkan periode: Hari ini, 7 Hari, Bulan ini, atau Semua</li>
+          </ul>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-white font-semibold flex items-center gap-2">💾 Backup Data</p>
+          <ul class="space-y-1 text-white/70 pl-4 list-disc">
+            <li><span class="text-white font-medium">Export</span> — download semua data sebagai file backup (.json)</li>
+            <li><span class="text-white font-medium">Import</span> — pulihkan data dari file backup</li>
+            <li>Lakukan export rutin agar data aman jika browser di-reset</li>
+            <li>Untuk pindah ke HP: export di laptop → kirim file → import di browser HP</li>
+          </ul>
+        </div>
+
+        <div class="bg-yellow-500/10 border border-yellow-400/30 rounded-2xl p-4">
+          <p class="text-yellow-300 text-xs font-semibold mb-1">⚠️ Penting</p>
+          <p class="text-yellow-200/70 text-xs">Data tersimpan di browser perangkat ini. Gunakan Export secara rutin sebagai cadangan agar data tidak hilang.</p>
+        </div>
+
+      </div>
+      <div class="p-4 border-t border-white/15">
+        <button onclick="document.getElementById('modalPanduan').classList.add('hidden')"
+          class="w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold transition cursor-pointer">
+          Tutup
+        </button>
       </div>
     </div>
   </div>

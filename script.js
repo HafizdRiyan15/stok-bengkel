@@ -578,13 +578,15 @@ function renderTable() {
   const tbody  = document.getElementById('listBarang');
   const mobile = document.getElementById('listBarangMobile');
   const empty  = document.getElementById('emptyState');
-  const cari   = (document.getElementById('searchBarang')?.value || '').toLowerCase();
+  const cari   = (document.getElementById('searchBarang')?.value || '').toLowerCase().trim();
 
   const filtered = barang
     .map((item, i) => ({ ...item, i }))
-    .filter(item => item.nama.toLowerCase().includes(cari));
+    .filter(item => !cari || item.nama.toLowerCase().includes(cari));
 
-  empty.style.display = filtered.length ? 'none' : 'block';
+  empty.style.display = (barang.length === 0 || filtered.length === 0) ? 'block' : 'none';
+  if (barang.length === 0) empty.textContent = 'Belum ada barang. Tambahkan sekarang ✨';
+  else if (filtered.length === 0) empty.textContent = `Barang "${cari}" tidak ditemukan`;
 
   // Desktop tabel rows
   tbody.innerHTML = filtered.map((item) => `
