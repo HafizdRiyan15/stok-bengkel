@@ -5,197 +5,689 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stok Bengkel</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #printArea { visibility: visible; position: fixed; top: 0; left: 0; width: 100%; background: white; padding: 24px; font-family: monospace; font-size: 13px; color: black; }
+      #printArea * { visibility: visible; }
+      #printArea button { display: none; }
+    }
+  </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 flex items-start justify-center p-6 font-sans">
+<body class="min-h-screen bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 font-sans">
 
   <!-- Blobs -->
   <div class="fixed top-[-80px] left-[-80px] w-72 h-72 bg-pink-400 rounded-full opacity-30 blur-3xl pointer-events-none"></div>
   <div class="fixed bottom-[-80px] right-[-80px] w-96 h-96 bg-blue-400 rounded-full opacity-30 blur-3xl pointer-events-none"></div>
 
-  <div class="w-full max-w-4xl backdrop-blur-xl bg-white/15 border border-white/25 rounded-3xl shadow-2xl p-8 mt-4">
+  <!-- Overlay mobile -->
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black/40 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
 
-    <!-- Header -->
-    <div class="flex items-center gap-3 mb-6">
-      <span class="text-4xl">🔧</span>
-      <div>
-        <h1 class="text-2xl font-bold text-white tracking-wide">Stok Sparepart Bengkel</h1>
-        <p class="text-white/60 text-sm">Kelola inventaris dengan mudah</p>
-      </div>
-    </div>
+  <div class="flex min-h-screen">
 
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-      <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
-        <p class="text-white/50 text-xs uppercase tracking-wider mb-1">Total Barang</p>
-        <p id="sumJenisBarang" class="text-white text-2xl font-bold">0</p>
-        <p class="text-white/40 text-xs mt-1">jenis</p>
-      </div>
-      <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
-        <p class="text-white/50 text-xs uppercase tracking-wider mb-1">Stok Tersedia</p>
-        <p id="sumStokTotal" class="text-white text-2xl font-bold">0</p>
-        <p class="text-white/40 text-xs mt-1">unit</p>
-      </div>
-      <div class="bg-emerald-500/20 border border-emerald-400/30 rounded-2xl p-4 text-center">
-        <p class="text-emerald-300/70 text-xs uppercase tracking-wider mb-1">Total Masuk</p>
-        <p id="sumUnitMasuk" class="text-emerald-300 text-xl font-bold">0</p>
-        <p id="sumNilaiMasuk" class="text-emerald-300/60 text-xs mt-1">Rp 0</p>
-      </div>
-      <div class="bg-red-500/20 border border-red-400/30 rounded-2xl p-4 text-center">
-        <p class="text-red-300/70 text-xs uppercase tracking-wider mb-1">Total Keluar</p>
-        <p id="sumUnitKeluar" class="text-red-300 text-xl font-bold">0</p>
-        <p id="sumNilaiKeluar" class="text-red-300/60 text-xs mt-1">Rp 0</p>
-      </div>
-    </div>
+    <!-- ── SIDEBAR ── -->
+    <aside id="sidebar"
+      class="fixed top-0 left-0 h-full w-64 z-30 flex flex-col
+             backdrop-blur-2xl bg-white/10 border-r border-white/20 shadow-2xl
+             -translate-x-full lg:translate-x-0 transition-transform duration-300">
 
-    <!-- Form Tambah Barang -->
-    <div class="bg-white/10 border border-white/20 rounded-2xl p-4 mb-6">
-      <p class="text-white/60 text-xs uppercase tracking-wider mb-3">Tambah Barang Baru</p>
-      <div class="flex flex-col sm:flex-row gap-3">
-        <input type="text" id="nama" placeholder="Nama Barang"
-          class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 focus:bg-white/20 transition">
-        <input type="number" id="stokAwal" placeholder="Stok Awal" min="0"
-          class="w-full sm:w-28 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 focus:bg-white/20 transition">
-        <input type="number" id="hargaBeli" placeholder="Harga Beli" min="0"
-          class="w-full sm:w-36 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 focus:bg-white/20 transition">
-        <input type="number" id="hargaJual" placeholder="Harga Jual" min="0"
-          class="w-full sm:w-36 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 focus:bg-white/20 transition">
-        <button onclick="tambahBarang()"
-          class="bg-white/90 hover:bg-white text-purple-700 font-semibold px-6 py-3 rounded-xl transition shadow-lg cursor-pointer whitespace-nowrap">
-          + Tambah
+      <!-- Logo -->
+      <div class="p-6 border-b border-white/15">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">🔧</span>
+          <div class="flex-1 min-w-0">
+            <p id="sidebarNamaBengkel" class="text-white font-bold text-lg leading-tight truncate cursor-pointer hover:text-white/80" onclick="openSettingNama()" title="Klik untuk ubah nama">Bengkel</p>
+            <p class="text-white/50 text-xs">Sparepart Manager</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav Menu -->
+      <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+        <button id="navDashboard" onclick="switchTab('dashboard')"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition cursor-pointer text-left text-white/70 hover:bg-white/10">
+          <span class="text-lg">🏠</span> Dashboard
         </button>
+        <button id="navStok" onclick="switchTab('stok')"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition cursor-pointer text-left bg-white text-purple-700 shadow-lg">
+          <span class="text-lg">📦</span> Stok Barang
+        </button>
+        <button id="navJasa" onclick="switchTab('jasa')"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition cursor-pointer text-left text-white/70 hover:bg-white/10">
+          <span class="text-lg">⚙️</span> Kelola Jasa
+        </button>
+        <button id="navKasir" onclick="switchTab('kasir')"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition cursor-pointer text-left text-white/70 hover:bg-white/10">
+          <span class="text-lg">🛒</span> Kasir
+        </button>
+        <button id="navKeluar" onclick="switchTab('keluar')"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition cursor-pointer text-left text-white/70 hover:bg-white/10">
+          <span class="text-lg">📤</span> Barang Keluar
+        </button>
+        <button id="navRiwayat" onclick="switchTab('riwayat')"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition cursor-pointer text-left text-white/70 hover:bg-white/10">
+          <span class="text-lg">📋</span> Riwayat
+        </button>
+        <button id="navLaporan" onclick="switchTab('laporan')"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition cursor-pointer text-left text-white/70 hover:bg-white/10">
+          <span class="text-lg">📊</span> Laporan
+        </button>
+      </nav>
+
+      <!-- Export / Import -->
+      <div class="p-4 border-t border-white/15 space-y-2">
+        <button onclick="exportData()"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition cursor-pointer text-white/70 hover:bg-white/10">
+          <span class="text-lg">💾</span> Export Backup
+        </button>
+        <label class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition cursor-pointer text-white/70 hover:bg-white/10">
+          <span class="text-lg">📂</span> Import Backup
+          <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+        </label>
       </div>
-    </div>
+    </aside>
 
-    <!-- Tabs -->
-    <div class="flex gap-2 mb-4 flex-wrap">
-      <button id="tabStok" onclick="switchTab('stok')"
-        class="px-5 py-2 rounded-xl text-sm font-semibold transition cursor-pointer bg-white text-purple-700 shadow">
-        📦 Stok Barang
-      </button>
-      <button id="tabKeluar" onclick="switchTab('keluar')"
-        class="px-5 py-2 rounded-xl text-sm font-semibold transition cursor-pointer bg-white/10 text-white/70 hover:bg-white/20">
-        📤 Barang Keluar
-      </button>
-      <button id="tabRiwayat" onclick="switchTab('riwayat')"
-        class="px-5 py-2 rounded-xl text-sm font-semibold transition cursor-pointer bg-white/10 text-white/70 hover:bg-white/20">
-        📋 Riwayat Transaksi
-      </button>
-    </div>
+    <!-- ── MAIN CONTENT ── -->
+    <div class="flex-1 flex flex-col min-h-screen lg:ml-64">
 
-    <!-- Panel: Stok -->
-    <div id="panelStok">
-      <div class="overflow-x-auto rounded-2xl border border-white/20">
-        <table class="w-full text-sm text-white">
-          <thead>
-            <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
-              <th class="px-4 py-3 text-left">Nama</th>
-              <th class="px-4 py-3 text-center">Stok</th>
-              <th class="px-4 py-3 text-right">Harga Beli</th>
-              <th class="px-4 py-3 text-right">Harga Jual</th>
-              <th class="px-4 py-3 text-right">Nilai Stok</th>
-              <th class="px-4 py-3 text-center">Transaksi</th>
-              <th class="px-4 py-3 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="listBarang" class="divide-y divide-white/10"></tbody>
-        </table>
-        <div id="emptyState" class="py-12 text-center text-white/40 text-sm">
-          Belum ada barang. Tambahkan sekarang ✨
+      <!-- Topbar -->
+      <header class="sticky top-0 z-10 backdrop-blur-xl bg-white/10 border-b border-white/15 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <!-- Hamburger -->
+          <button onclick="toggleSidebar()" class="lg:hidden text-white cursor-pointer">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+          <div>
+            <h1 id="pageTitle" class="text-white font-bold text-lg">Stok Barang</h1>
+            <p id="pageSubtitle" class="text-white/50 text-xs">Kelola inventaris sparepart</p>
+          </div>
         </div>
+        <!-- Summary mini -->
+        <div class="hidden sm:flex items-center gap-4 text-xs text-white/60">
+          <span>📦 <span id="sumJenisBarang" class="text-white font-bold">0</span> jenis</span>
+          <span>📥 <span id="sumUnitMasuk" class="text-emerald-300 font-bold">0</span> masuk</span>
+          <span>📤 <span id="sumUnitKeluar" class="text-red-300 font-bold">0</span> keluar</span>
+        </div>
+      </header>
+
+      <!-- Page content -->
+      <main class="flex-1 p-6 space-y-6">
+
+        <!-- Notifikasi stok kritis -->
+        <div id="notifStokKritis" class="hidden bg-yellow-500/20 border border-yellow-400/40 rounded-2xl px-5 py-3 flex items-center gap-3">
+          <span class="text-xl">⚠️</span>
+          <p id="notifStokKritisText" class="text-yellow-200 text-sm flex-1"></p>
+          <button onclick="switchTab('dashboard')" class="text-yellow-300 text-xs hover:text-white transition cursor-pointer whitespace-nowrap">Lihat →</button>
+          <button onclick="document.getElementById('notifStokKritis').classList.add('hidden')" class="text-yellow-300/50 hover:text-yellow-200 text-lg leading-none cursor-pointer">×</button>
+        </div>
+
+        <!-- Summary Cards (hanya tampil di stok) -->
+        <div id="summaryCards" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
+            <p class="text-white/50 text-xs uppercase tracking-wider mb-1">Total Barang</p>
+            <p id="sumJenisBarang2" class="text-white text-2xl font-bold">0</p>
+            <p class="text-white/40 text-xs mt-1">jenis</p>
+          </div>
+          <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
+            <p class="text-white/50 text-xs uppercase tracking-wider mb-1">Stok Tersedia</p>
+            <p id="sumStokTotal" class="text-white text-2xl font-bold">0</p>
+            <p class="text-white/40 text-xs mt-1">unit</p>
+          </div>
+          <div class="bg-emerald-500/20 border border-emerald-400/30 rounded-2xl p-4 text-center">
+            <p class="text-emerald-300/70 text-xs uppercase tracking-wider mb-1">Total Masuk</p>
+            <p id="sumUnitMasuk2" class="text-emerald-300 text-xl font-bold">0</p>
+            <p id="sumNilaiMasuk" class="text-emerald-300/60 text-xs mt-1">Rp 0</p>
+          </div>
+          <div class="bg-red-500/20 border border-red-400/30 rounded-2xl p-4 text-center">
+            <p class="text-red-300/70 text-xs uppercase tracking-wider mb-1">Total Keluar</p>
+            <p id="sumUnitKeluar2" class="text-red-300 text-xl font-bold">0</p>
+            <p id="sumNilaiKeluar" class="text-red-300/60 text-xs mt-1">Rp 0</p>
+          </div>
+        </div>
+
+        <!-- Form Tambah Barang -->
+        <div id="formBarang" class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5">
+          <p class="text-white/60 text-xs uppercase tracking-wider mb-3">Tambah Barang Baru</p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="nama" placeholder="Nama Barang"
+              class="flex-1 bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition">
+            <input type="number" id="stokAwal" placeholder="Stok Awal" min="0"
+              class="w-full sm:w-28 bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition">
+            <input type="number" id="hargaBeli" placeholder="Harga Beli" min="0"
+              class="w-full sm:w-36 bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition">
+            <input type="number" id="hargaJual" placeholder="Harga Jual" min="0"
+              class="w-full sm:w-36 bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition">
+            <select id="kategoriMasuk" onchange="toggleKetLainnya()"
+              class="w-full sm:w-40 bg-indigo-900 border border-white/20 rounded-xl px-4 py-3 text-white outline-none focus:border-white/60 transition cursor-pointer">
+              <option value="Stok awal">📦 Stok Awal</option>
+              <option value="Pembelian">🛍️ Pembelian</option>
+              <option value="Lainnya">✏️ Lainnya</option>
+            </select>
+            <button onclick="tambahBarang()"
+              class="bg-white/90 hover:bg-white text-purple-700 font-semibold px-6 py-3 rounded-xl transition shadow-lg cursor-pointer whitespace-nowrap">
+              + Tambah
+            </button>
+          </div>
+          <!-- Input keterangan lainnya -->
+          <div id="ketLainnyaWrap" class="hidden mt-3">
+            <input type="text" id="ketLainnya" placeholder="Tulis keterangan..."
+              class="w-full bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/60 transition text-sm">
+          </div>
+        </div>
+
+        <!-- Panel: Dashboard -->
+        <div id="panelDashboard" class="hidden space-y-5">
+
+          <!-- Stat Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-violet-500/30 flex items-center justify-center text-2xl">📦</div>
+              <div>
+                <p class="text-white/50 text-xs uppercase tracking-wider">Total Barang</p>
+                <p id="dbTotalBarang" class="text-white text-2xl font-bold">0</p>
+                <p class="text-white/40 text-xs">jenis</p>
+              </div>
+            </div>
+            <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-blue-500/30 flex items-center justify-center text-2xl">🗂️</div>
+              <div>
+                <p class="text-white/50 text-xs uppercase tracking-wider">Total Stok</p>
+                <p id="dbTotalStok" class="text-white text-2xl font-bold">0</p>
+                <p class="text-white/40 text-xs">unit</p>
+              </div>
+            </div>
+            <div class="backdrop-blur-xl bg-emerald-500/20 border border-emerald-400/30 rounded-2xl p-5 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-500/30 flex items-center justify-center text-2xl">📥</div>
+              <div>
+                <p class="text-emerald-300/70 text-xs uppercase tracking-wider">Nilai Masuk</p>
+                <p id="dbNilaiMasuk" class="text-emerald-300 text-xl font-bold">Rp 0</p>
+                <p id="dbUnitMasuk" class="text-emerald-300/50 text-xs">0 unit</p>
+              </div>
+            </div>
+            <div class="backdrop-blur-xl bg-red-500/20 border border-red-400/30 rounded-2xl p-5 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-red-500/30 flex items-center justify-center text-2xl">📤</div>
+              <div>
+                <p class="text-red-300/70 text-xs uppercase tracking-wider">Nilai Keluar</p>
+                <p id="dbNilaiKeluar" class="text-red-300 text-xl font-bold">Rp 0</p>
+                <p id="dbUnitKeluar" class="text-red-300/50 text-xs">0 unit</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: Chart + Jasa -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+            <!-- Bar Chart Transaksi 7 Hari -->
+            <div class="lg:col-span-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5">
+              <p class="text-white font-semibold mb-1">Transaksi 7 Hari Terakhir</p>
+              <p class="text-white/40 text-xs mb-4">Nilai masuk vs keluar per hari</p>
+              <div id="dbChart" class="flex items-end gap-2 h-36"></div>
+              <div class="flex gap-4 mt-3">
+                <span class="flex items-center gap-1 text-xs text-white/50"><span class="w-3 h-3 rounded bg-emerald-400 inline-block"></span>Masuk</span>
+                <span class="flex items-center gap-1 text-xs text-white/50"><span class="w-3 h-3 rounded bg-red-400 inline-block"></span>Keluar</span>
+              </div>
+            </div>
+
+            <!-- Jasa Stats -->
+            <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5">
+              <p class="text-white font-semibold mb-1">Jasa Terdaftar</p>
+              <p class="text-white/40 text-xs mb-4">Daftar layanan bengkel</p>
+              <div id="dbJasaList" class="space-y-2 max-h-40 overflow-y-auto"></div>
+              <div id="dbJasaEmpty" class="py-6 text-center text-white/30 text-xs">Belum ada jasa</div>
+            </div>
+          </div>
+
+          <!-- Row 3: Stok Kritis + Transaksi Terakhir -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+            <!-- Stok Kritis -->
+            <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="text-lg">⚠️</span>
+                <div>
+                  <p class="text-white font-semibold">Stok Kritis</p>
+                  <p class="text-white/40 text-xs">Barang dengan stok ≤ 3</p>
+                </div>
+              </div>
+              <div id="dbStokKritis" class="space-y-2"></div>
+              <div id="dbStokKritisEmpty" class="py-6 text-center text-emerald-300/60 text-xs">✅ Semua stok aman</div>
+            </div>
+
+            <!-- Transaksi Terakhir -->
+            <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <p class="text-white font-semibold">Transaksi Terakhir</p>
+                  <p class="text-white/40 text-xs">5 aktivitas terbaru</p>
+                </div>
+                <button onclick="switchTab('riwayat')" class="text-white/40 hover:text-white text-xs transition cursor-pointer">Lihat semua →</button>
+              </div>
+              <div id="dbRiwayatTerakhir" class="space-y-2"></div>
+              <div id="dbRiwayatEmpty" class="py-6 text-center text-white/30 text-xs">Belum ada transaksi</div>
+            </div>
+          </div>
+
+          <!-- Row 4: Top Barang Keluar -->
+          <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5">
+            <p class="text-white font-semibold mb-1">Top Barang Terlaris</p>
+            <p class="text-white/40 text-xs mb-4">Berdasarkan total unit keluar</p>
+            <div id="dbTopBarang" class="space-y-3"></div>
+            <div id="dbTopBarangEmpty" class="py-6 text-center text-white/30 text-xs">Belum ada data penjualan</div>
+          </div>
+
+        </div>
+
+        <!-- Panel: Stok -->
+        <div id="panelStok" class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-white">
+              <thead>
+                <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
+                  <th class="px-4 py-3 text-left">Nama</th>
+                  <th class="px-4 py-3 text-center">Stok</th>
+                  <th class="px-4 py-3 text-right">Harga Beli</th>
+                  <th class="px-4 py-3 text-right">Harga Jual</th>
+                  <th class="px-4 py-3 text-right">Nilai Stok</th>
+                  <th class="px-4 py-3 text-center">Transaksi</th>
+                  <th class="px-4 py-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="listBarang" class="divide-y divide-white/10"></tbody>
+            </table>
+            <div id="emptyState" class="py-12 text-center text-white/40 text-sm">Belum ada barang. Tambahkan sekarang ✨</div>
+          </div>
+        </div>
+
+        <!-- Panel: Kelola Jasa -->
+        <div id="panelJasa" class="hidden space-y-4">
+          <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-5">
+            <p class="text-white/60 text-xs uppercase tracking-wider mb-3">Tambah Jasa Baru</p>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <input type="text" id="jasaNama" placeholder="Nama Jasa (cth: Ganti Oli, Tune Up)"
+                class="flex-1 bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition">
+              <input type="number" id="jasaTarif" placeholder="Tarif (Rp)" min="0"
+                class="w-full sm:w-40 bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition">
+              <button onclick="tambahJasa()"
+                class="bg-white/90 hover:bg-white text-purple-700 font-semibold px-6 py-3 rounded-xl transition shadow-lg cursor-pointer whitespace-nowrap">
+                + Tambah
+              </button>
+            </div>
+          </div>
+          <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-white">
+                <thead>
+                  <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
+                    <th class="px-4 py-3 text-left">Nama Jasa</th>
+                    <th class="px-4 py-3 text-right">Tarif</th>
+                    <th class="px-4 py-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="listJasa" class="divide-y divide-white/10"></tbody>
+              </table>
+              <div id="emptyJasa" class="py-12 text-center text-white/40 text-sm">Belum ada jasa. Tambahkan sekarang ✨</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel: Kasir -->
+        <div id="panelKasir" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-4">
+              <div>
+                <p class="text-white/60 text-xs uppercase tracking-wider mb-2">Pilih Sparepart</p>
+                <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
+                  <div class="p-3 border-b border-white/10">
+                    <input type="text" id="kasirCari" placeholder="Cari barang..." oninput="renderKasirPilih()"
+                      class="w-full bg-white/15 border border-white/30 rounded-xl px-3 py-2 text-white placeholder-white/60 outline-none focus:border-white/60 text-sm transition">
+                  </div>
+                  <div id="kasirListBarang" class="max-h-48 overflow-y-auto divide-y divide-white/10"></div>
+                  <div id="kasirEmpty" class="py-6 text-center text-white/40 text-sm hidden">Tidak ada barang tersedia</div>
+                </div>
+              </div>
+              <div>
+                <p class="text-white/60 text-xs uppercase tracking-wider mb-2">Pilih Jasa</p>
+                <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
+                  <div id="kasirListJasa" class="max-h-48 overflow-y-auto divide-y divide-white/10"></div>
+                  <div id="kasirEmptyJasa" class="py-6 text-center text-white/40 text-sm">Belum ada jasa tersedia</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-white/60 text-xs uppercase tracking-wider">Keranjang</p>
+                <button onclick="keranjangKosong()" class="text-white/30 hover:text-red-300 text-xs transition cursor-pointer">Kosongkan</button>
+              </div>
+              <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
+                <div id="kasirKeranjang" class="max-h-64 overflow-y-auto divide-y divide-white/10"></div>
+                <div id="kasirKeranjangEmpty" class="py-8 text-center text-white/40 text-sm">Keranjang kosong 🛒</div>
+                <div class="p-4 border-t border-white/10 space-y-1">
+                  <div class="flex justify-between text-white/50 text-xs"><span>Sparepart</span><span id="kasirSubtotalBarang">Rp 0</span></div>
+                  <div class="flex justify-between text-white/50 text-xs"><span>Jasa</span><span id="kasirSubtotalJasa">Rp 0</span></div>
+                  <div class="flex justify-between text-white font-bold text-lg pt-1 border-t border-white/10"><span>Total</span><span id="kasirTotal">Rp 0</span></div>
+                </div>
+              </div>
+              <div class="mt-3 flex flex-col gap-2">
+                <input type="text" id="kasirPelanggan" placeholder="Nama Pelanggan (opsional)"
+                  class="w-full bg-white/15 border border-white/30 rounded-xl px-4 py-2 text-white placeholder-white/60 outline-none focus:border-white/60 text-sm transition">
+                <button onclick="prosesTransaksi()"
+                  class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3 rounded-xl transition cursor-pointer">
+                  ✅ Proses Transaksi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel: Barang Keluar -->
+        <div id="panelKeluar" class="hidden space-y-4">
+          <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-white">
+                <thead>
+                  <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
+                    <th class="px-4 py-3 text-left">Nama Barang</th>
+                    <th class="px-4 py-3 text-center">Total Unit Keluar</th>
+                    <th class="px-4 py-3 text-right">Harga Jual</th>
+                    <th class="px-4 py-3 text-right">Total Nilai Keluar</th>
+                    <th class="px-4 py-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="listKeluar" class="divide-y divide-white/10"></tbody>
+              </table>
+              <div id="emptyKeluar" class="py-12 text-center text-white/40 text-sm">Belum ada transaksi keluar ✨</div>
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <div class="bg-red-500/20 border border-red-400/30 rounded-2xl px-6 py-4 text-right">
+              <p class="text-red-300/70 text-xs uppercase tracking-wider mb-1">Grand Total Keluar</p>
+              <p id="grandTotalKeluar" class="text-red-300 text-2xl font-bold">Rp 0</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel: Riwayat -->
+        <div id="panelRiwayat" class="hidden space-y-4">
+          <!-- Filter bar -->
+          <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 flex flex-wrap gap-3 items-center">
+            <input type="text" id="filterNama" placeholder="Cari nama..." oninput="renderRiwayat()"
+              class="flex-1 min-w-32 bg-white/15 border border-white/30 rounded-xl px-3 py-2 text-white placeholder-white/60 outline-none focus:border-white/60 text-sm transition">
+            <select id="filterTipe" onchange="renderRiwayat()"
+              class="bg-indigo-900 border border-white/30 rounded-xl px-3 py-2 text-white text-sm outline-none cursor-pointer">
+              <option value="">Semua Tipe</option>
+              <option value="masuk">📥 Masuk</option>
+              <option value="keluar">📤 Keluar</option>
+              <option value="jasa">⚙️ Jasa</option>
+            </select>
+            <input type="date" id="filterTanggal" onchange="renderRiwayat()"
+              class="bg-indigo-900 border border-white/30 rounded-xl px-3 py-2 text-white text-sm outline-none cursor-pointer">
+            <button onclick="resetFilterRiwayat()"
+              class="bg-white/10 hover:bg-white/20 text-white/60 hover:text-white px-4 py-2 rounded-xl text-sm transition cursor-pointer">
+              Reset
+            </button>
+            <button onclick="hapusSemuaRiwayat()"
+              class="bg-red-500/20 hover:bg-red-500/40 text-red-300 px-4 py-2 rounded-xl text-sm transition cursor-pointer">
+              🗑️ Hapus Semua
+            </button>
+          </div>
+          <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-white">
+                <thead>
+                  <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
+                    <th class="px-4 py-3 text-left">Waktu</th>
+                    <th class="px-4 py-3 text-left">Nama</th>
+                    <th class="px-4 py-3 text-center">Tipe</th>
+                    <th class="px-4 py-3 text-center">Jumlah</th>
+                    <th class="px-4 py-3 text-right">Harga Satuan</th>
+                    <th class="px-4 py-3 text-right">Total</th>
+                    <th class="px-4 py-3 text-left">Keterangan</th>
+                    <th class="px-4 py-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="listRiwayat" class="divide-y divide-white/10"></tbody>
+              </table>
+              <div id="emptyRiwayat" class="py-12 text-center text-white/40 text-sm">Belum ada transaksi ✨</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel: Laporan -->
+        <div id="panelLaporan" class="hidden space-y-5">
+          <!-- Filter periode -->
+          <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 flex flex-wrap gap-3 items-center">
+            <p class="text-white/60 text-xs uppercase tracking-wider">Periode:</p>
+            <button onclick="setPeriode('hari')" id="btnHari"
+              class="px-4 py-2 rounded-xl text-sm font-semibold transition cursor-pointer bg-white text-purple-700 shadow">Hari Ini</button>
+            <button onclick="setPeriode('minggu')" id="btnMinggu"
+              class="px-4 py-2 rounded-xl text-sm font-semibold transition cursor-pointer bg-white/10 text-white/70 hover:bg-white/20">7 Hari</button>
+            <button onclick="setPeriode('bulan')" id="btnBulan"
+              class="px-4 py-2 rounded-xl text-sm font-semibold transition cursor-pointer bg-white/10 text-white/70 hover:bg-white/20">Bulan Ini</button>
+            <button onclick="setPeriode('semua')" id="btnSemua"
+              class="px-4 py-2 rounded-xl text-sm font-semibold transition cursor-pointer bg-white/10 text-white/70 hover:bg-white/20">Semua</button>
+          </div>
+
+          <!-- Rekap cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="backdrop-blur-xl bg-emerald-500/20 border border-emerald-400/30 rounded-2xl p-5">
+              <p class="text-emerald-300/70 text-xs uppercase tracking-wider mb-1">Pemasukan</p>
+              <p id="lapNilaiMasuk" class="text-emerald-300 text-xl font-bold">Rp 0</p>
+              <p id="lapUnitMasuk" class="text-emerald-300/50 text-xs mt-1">0 unit</p>
+            </div>
+            <div class="backdrop-blur-xl bg-red-500/20 border border-red-400/30 rounded-2xl p-5">
+              <p class="text-red-300/70 text-xs uppercase tracking-wider mb-1">Pengeluaran</p>
+              <p id="lapNilaiKeluar" class="text-red-300 text-xl font-bold">Rp 0</p>
+              <p id="lapUnitKeluar" class="text-red-300/50 text-xs mt-1">0 unit</p>
+            </div>
+            <div class="backdrop-blur-xl bg-orange-500/20 border border-orange-400/30 rounded-2xl p-5">
+              <p class="text-orange-300/70 text-xs uppercase tracking-wider mb-1">Pendapatan Jasa</p>
+              <p id="lapNilaiJasa" class="text-orange-300 text-xl font-bold">Rp 0</p>
+              <p id="lapTrxJasa" class="text-orange-300/50 text-xs mt-1">0 transaksi</p>
+            </div>
+            <div class="backdrop-blur-xl bg-violet-500/20 border border-violet-400/30 rounded-2xl p-5">
+              <p class="text-violet-300/70 text-xs uppercase tracking-wider mb-1">Keuntungan Kotor</p>
+              <p id="lapKeuntungan" class="text-violet-300 text-xl font-bold">Rp 0</p>
+              <p class="text-violet-300/50 text-xs mt-1">Jual − Beli</p>
+            </div>
+          </div>
+
+          <!-- Detail tabel laporan -->
+          <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
+            <div class="p-4 border-b border-white/10">
+              <p class="text-white font-semibold">Detail Transaksi</p>
+              <p id="lapPeriodeLabel" class="text-white/40 text-xs mt-1">Hari ini</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-white">
+                <thead>
+                  <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
+                    <th class="px-4 py-3 text-left">Waktu</th>
+                    <th class="px-4 py-3 text-left">Nama</th>
+                    <th class="px-4 py-3 text-center">Tipe</th>
+                    <th class="px-4 py-3 text-center">Jumlah</th>
+                    <th class="px-4 py-3 text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody id="lapTabel" class="divide-y divide-white/10"></tbody>
+              </table>
+              <div id="lapEmpty" class="py-12 text-center text-white/40 text-sm">Tidak ada transaksi pada periode ini</div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div><!-- end main -->
+  </div><!-- end flex -->
+
+  <!-- Modal Nota -->
+  <div id="modalNota" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl mx-4 overflow-y-auto max-h-[90vh]">
+      <div id="notaContent" class="p-6">
+        <div class="text-center mb-4">
+          <p class="text-2xl">🔧</p>
+          <h2 class="font-bold text-gray-800 text-lg" id="notaNamaBengkel">Bengkel Sparepart</h2>
+          <p class="text-gray-400 text-xs" id="notaWaktu"></p>
+          <p class="text-gray-500 text-xs mt-1">No. <span id="notaNo" class="font-mono font-bold"></span></p>
+        </div>
+        <div class="border-t border-dashed border-gray-300 my-3"></div>
+        <p class="text-xs text-gray-500 mb-3">Pelanggan: <span id="notaPelanggan" class="font-semibold text-gray-700"></span></p>
+        <div id="notaSparepartSection">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Sparepart</p>
+          <table class="w-full text-xs mb-2">
+            <thead><tr class="text-gray-400 border-b border-gray-200">
+              <th class="text-left py-1">Barang</th><th class="text-center py-1">Qty</th>
+              <th class="text-right py-1">Harga</th><th class="text-right py-1">Subtotal</th>
+            </tr></thead>
+            <tbody id="notaItemsBarang" class="text-gray-700"></tbody>
+          </table>
+          <div class="flex justify-between text-xs text-gray-500 mb-3">
+            <span>Subtotal Sparepart</span><span id="notaSubtotalBarang" class="font-semibold"></span>
+          </div>
+        </div>
+        <div id="notaJasaSection">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Jasa</p>
+          <table class="w-full text-xs mb-2">
+            <thead><tr class="text-gray-400 border-b border-gray-200">
+              <th class="text-left py-1">Jasa</th><th class="text-right py-1">Tarif</th>
+            </tr></thead>
+            <tbody id="notaItemsJasa" class="text-gray-700"></tbody>
+          </table>
+          <div class="flex justify-between text-xs text-gray-500 mb-3">
+            <span>Subtotal Jasa</span><span id="notaSubtotalJasa" class="font-semibold"></span>
+          </div>
+        </div>
+        <div class="border-t border-dashed border-gray-300 my-3"></div>
+        <div class="flex justify-between font-bold text-gray-800 text-sm">
+          <span>GRAND TOTAL</span><span id="notaTotal"></span>
+        </div>
+        <div class="border-t border-dashed border-gray-300 my-3"></div>
+        <p class="text-center text-gray-400 text-xs">Terima kasih atas kunjungan Anda 🙏</p>
+      </div>
+      <div class="flex gap-3 p-4 bg-gray-50 border-t border-gray-100">
+        <button onclick="closeNota()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-xl font-semibold text-sm transition cursor-pointer">Tutup</button>
+        <button onclick="cetakNota()" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-xl font-semibold text-sm transition cursor-pointer">🖨️ Cetak Nota</button>
       </div>
     </div>
+  </div>
 
-    <!-- Panel: Barang Keluar -->
-    <div id="panelKeluar" class="hidden">
-      <div class="overflow-x-auto rounded-2xl border border-white/20">
-        <table class="w-full text-sm text-white">
-          <thead>
-            <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
-              <th class="px-4 py-3 text-left">Nama Barang</th>
-              <th class="px-4 py-3 text-center">Total Unit Keluar</th>
-              <th class="px-4 py-3 text-right">Harga Jual</th>
-              <th class="px-4 py-3 text-right">Total Nilai Keluar</th>
-              <th class="px-4 py-3 text-center">Aksi Keluar</th>
-            </tr>
-          </thead>
-          <tbody id="listKeluar" class="divide-y divide-white/10"></tbody>
-        </table>
-        <div id="emptyKeluar" class="py-12 text-center text-white/40 text-sm">
-          Belum ada transaksi keluar ✨
-        </div>
-      </div>
-      <!-- Total Nilai Keluar -->
-      <div class="mt-4 flex justify-end">
-        <div class="bg-red-500/20 border border-red-400/30 rounded-2xl px-6 py-4 text-right">
-          <p class="text-red-300/70 text-xs uppercase tracking-wider mb-1">Grand Total Keluar</p>
-          <p id="grandTotalKeluar" class="text-red-300 text-2xl font-bold">Rp 0</p>
-        </div>
+  <!-- Modal Setting Nama Bengkel -->
+  <div id="modalSettingNama" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-indigo-900/90 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-sm shadow-2xl mx-4">
+      <h2 class="text-white text-xl font-bold mb-1">🔧 Nama Bengkel</h2>
+      <p class="text-white/75 text-sm mb-6">Nama ini akan tampil di nota dan header</p>
+      <input type="text" id="inputNamaBengkel" placeholder="Nama bengkel kamu"
+        class="w-full bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/60 transition mb-4">
+      <div class="flex gap-3">
+        <button onclick="closeSettingNama()" class="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Batal</button>
+        <button onclick="simpanNamaBengkel()" class="flex-1 bg-violet-500 hover:bg-violet-400 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Simpan</button>
       </div>
     </div>
+  </div>
 
-    <!-- Panel: Riwayat -->
-    <div id="panelRiwayat" class="hidden">
-      <div class="overflow-x-auto rounded-2xl border border-white/20">
-        <table class="w-full text-sm text-white">
-          <thead>
-            <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
-              <th class="px-4 py-3 text-left">Waktu</th>
-              <th class="px-4 py-3 text-left">Barang</th>
-              <th class="px-4 py-3 text-center">Tipe</th>
-              <th class="px-4 py-3 text-center">Jumlah</th>
-              <th class="px-4 py-3 text-right">Harga Satuan</th>
-              <th class="px-4 py-3 text-right">Total Harga</th>
-              <th class="px-4 py-3 text-left">Keterangan</th>
-            </tr>
-          </thead>
-          <tbody id="listRiwayat" class="divide-y divide-white/10"></tbody>
-        </table>
-        <div id="emptyRiwayat" class="py-12 text-center text-white/40 text-sm">
-          Belum ada transaksi ✨
-        </div>
+  <!-- Modal Konfirmasi Hapus Riwayat -->
+  <div id="modalHapusRiwayat" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-indigo-900/90 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-sm shadow-2xl mx-4">
+      <div class="text-center mb-6">
+        <span class="text-5xl">🗑️</span>
+        <h2 id="hapusRiwayatJudul" class="text-white text-xl font-bold mt-3 mb-1">Hapus Riwayat?</h2>
+        <p id="hapusRiwayatSub" class="text-white/50 text-sm">Tindakan ini tidak bisa dibatalkan.</p>
+      </div>
+      <input type="hidden" id="hapusRiwayatIndex">
+      <div class="flex gap-3">
+        <button onclick="closeHapusRiwayat()" class="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Batal</button>
+        <button onclick="konfirmasiHapusRiwayat()" class="flex-1 bg-red-500 hover:bg-red-400 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Ya, Hapus</button>
       </div>
     </div>
+  </div>
 
+  <!-- Modal Edit Jasa -->
+  <div id="modalEditJasa" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-indigo-900/90 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-sm shadow-2xl mx-4">
+      <h2 class="text-white text-xl font-bold mb-1">✏️ Ubah Jasa</h2>
+      <p class="text-white/75 text-sm mb-6">Perbaiki nama atau tarif jasa</p>
+      <input type="hidden" id="editJasaIndex">
+      <div class="flex flex-col gap-3">
+        <div><label class="text-white/80 text-xs uppercase tracking-wider mb-1 block font-medium">Nama Jasa</label>
+          <input type="text" id="editJasaNama" class="w-full bg-white/20 border border-white/40 rounded-xl px-4 py-3 text-white outline-none focus:border-white/80 transition"></div>
+        <div><label class="text-white/80 text-xs uppercase tracking-wider mb-1 block font-medium">Tarif</label>
+          <input type="number" id="editJasaTarif" min="0" class="w-full bg-white/20 border border-white/40 rounded-xl px-4 py-3 text-white outline-none focus:border-white/80 transition"></div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeEditJasa()" class="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Batal</button>
+        <button onclick="simpanEditJasa()" class="flex-1 bg-blue-500 hover:bg-blue-400 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Hapus -->
+  <div id="modalHapus" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-indigo-900/90 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-sm shadow-2xl mx-4">
+      <div class="text-center mb-6">
+        <span class="text-5xl">🗑️</span>
+        <h2 class="text-white text-xl font-bold mt-3 mb-1">Hapus Barang?</h2>
+        <p class="text-white/50 text-sm">Barang <span id="hapusNama" class="text-white font-semibold"></span> akan dihapus permanen.</p>
+      </div>
+      <input type="hidden" id="hapusIndex">
+      <div class="flex gap-3">
+        <button onclick="closeHapus()" class="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Batal</button>
+        <button onclick="konfirmasiHapus()" class="flex-1 bg-red-500 hover:bg-red-400 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Ya, Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Edit Barang -->
+  <div id="modalEdit" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-indigo-900/90 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-sm shadow-2xl mx-4">
+      <h2 class="text-white text-xl font-bold mb-1">✏️ Ubah Data Barang</h2>
+      <p class="text-white/75 text-sm mb-6">Perbaiki data yang salah input</p>
+      <input type="hidden" id="editIndex">
+      <div class="flex flex-col gap-3">
+        <div><label class="text-white/80 text-xs uppercase tracking-wider mb-1 block font-medium">Nama Barang</label>
+          <input type="text" id="editNama" class="w-full bg-white/20 border border-white/40 rounded-xl px-4 py-3 text-white outline-none focus:border-white/80 transition"></div>
+        <div><label class="text-white/80 text-xs uppercase tracking-wider mb-1 block font-medium">Jumlah Stok</label>
+          <input type="number" id="editStok" min="0" class="w-full bg-white/20 border border-white/40 rounded-xl px-4 py-3 text-white outline-none focus:border-white/80 transition"></div>
+        <div><label class="text-white/80 text-xs uppercase tracking-wider mb-1 block font-medium">Harga Beli</label>
+          <input type="number" id="editHargaBeli" min="0" class="w-full bg-white/20 border border-white/40 rounded-xl px-4 py-3 text-white outline-none focus:border-white/80 transition"></div>
+        <div><label class="text-white/80 text-xs uppercase tracking-wider mb-1 block font-medium">Harga Jual</label>
+          <input type="number" id="editHargaJual" min="0" class="w-full bg-white/20 border border-white/40 rounded-xl px-4 py-3 text-white outline-none focus:border-white/80 transition"></div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeEdit()" class="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Batal</button>
+        <button onclick="simpanEdit()" class="flex-1 bg-blue-500 hover:bg-blue-400 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Simpan</button>
+      </div>
+    </div>
   </div>
 
   <!-- Modal Transaksi -->
   <div id="modalOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-    <div class="bg-indigo-900/80 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-sm shadow-2xl mx-4">
+    <div class="bg-indigo-900/90 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-sm shadow-2xl mx-4">
       <h2 id="modalTitle" class="text-white text-xl font-bold mb-1"></h2>
-      <p id="modalSubtitle" class="text-white/50 text-sm mb-6"></p>
+      <p id="modalSubtitle" class="text-white/75 text-sm mb-6"></p>
       <div class="flex flex-col gap-3">
-        <div>
-          <label class="text-white/50 text-xs uppercase tracking-wider mb-1 block">Jumlah</label>
+        <div><label class="text-white/80 text-xs uppercase tracking-wider mb-1 block font-medium">Jumlah</label>
           <input type="number" id="modalJumlah" placeholder="Masukkan jumlah" min="1"
-            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 transition">
-        </div>
-        <div>
-          <label class="text-white/50 text-xs uppercase tracking-wider mb-1 block" id="modalHargaLabel">Harga Satuan</label>
+            class="w-full bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition"></div>
+        <div><label class="text-white/80 text-xs uppercase tracking-wider mb-1 block font-medium" id="modalHargaLabel">Harga Satuan</label>
           <input type="number" id="modalHarga" placeholder="Harga satuan" min="0"
-            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 transition">
-        </div>
-        <div id="modalTotalWrap" class="bg-white/10 rounded-xl px-4 py-3 flex justify-between items-center">
+            class="w-full bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition"></div>
+        <div class="bg-white/10 rounded-xl px-4 py-3 flex justify-between items-center">
           <span class="text-white/50 text-sm">Total</span>
           <span id="modalTotal" class="text-white font-bold">Rp 0</span>
         </div>
-        <div>
-          <label class="text-white/50 text-xs uppercase tracking-wider mb-1 block">Keterangan</label>
+        <div><label class="text-white/80 text-xs uppercase tracking-wider mb-1 block font-medium">Keterangan</label>
           <input type="text" id="modalKeterangan" placeholder="Opsional"
-            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 transition">
-        </div>
+            class="w-full bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/60 outline-none focus:border-white/80 transition"></div>
       </div>
       <div class="flex gap-3 mt-6">
-        <button onclick="closeModal()"
-          class="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold transition cursor-pointer">
-          Batal
-        </button>
-        <button id="modalConfirm" onclick="konfirmasiTransaksi()"
-          class="flex-1 py-3 rounded-xl font-semibold transition cursor-pointer">
-          Konfirmasi
-        </button>
+        <button onclick="closeModal()" class="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold transition cursor-pointer">Batal</button>
+        <button id="modalConfirm" onclick="konfirmasiTransaksi()" class="flex-1 py-3 rounded-xl font-semibold transition cursor-pointer">Konfirmasi</button>
       </div>
     </div>
   </div>
+
+  <div id="printArea" style="display:none"></div>
 
   <script src="script.js"></script>
 </body>
