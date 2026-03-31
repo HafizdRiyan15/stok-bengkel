@@ -578,10 +578,16 @@ function renderTable() {
   const tbody  = document.getElementById('listBarang');
   const mobile = document.getElementById('listBarangMobile');
   const empty  = document.getElementById('emptyState');
-  empty.style.display = barang.length ? 'none' : 'block';
+  const cari   = (document.getElementById('searchBarang')?.value || '').toLowerCase();
+
+  const filtered = barang
+    .map((item, i) => ({ ...item, i }))
+    .filter(item => item.nama.toLowerCase().includes(cari));
+
+  empty.style.display = filtered.length ? 'none' : 'block';
 
   // Desktop tabel rows
-  tbody.innerHTML = barang.map((item, i) => `
+  tbody.innerHTML = filtered.map((item) => `
     <tr class="hover:bg-white/10 transition">
       <td class="px-4 py-3 font-medium">${item.nama}</td>
       <td class="px-4 py-3 text-center">
@@ -592,20 +598,20 @@ function renderTable() {
       <td class="px-4 py-3 text-right text-white/70">Rp ${(item.stok*item.hargaBeli).toLocaleString('id-ID')}</td>
       <td class="px-4 py-3 text-center">
         <div class="flex gap-2 justify-center">
-          <button data-action="masuk" data-index="${i}" class="bg-emerald-500/30 hover:bg-emerald-500/50 text-emerald-300 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">+ Masuk</button>
-          <button data-action="keluar" data-index="${i}" class="bg-red-500/30 hover:bg-red-500/50 text-red-300 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">− Keluar</button>
+          <button data-action="masuk" data-index="${item.i}" class="bg-emerald-500/30 hover:bg-emerald-500/50 text-emerald-300 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">+ Masuk</button>
+          <button data-action="keluar" data-index="${item.i}" class="bg-red-500/30 hover:bg-red-500/50 text-red-300 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">− Keluar</button>
         </div>
       </td>
       <td class="px-4 py-3 text-center">
         <div class="flex gap-2 justify-center">
-          <button data-action="edit" data-index="${i}" class="text-blue-300 hover:bg-blue-500/20 px-3 py-1 rounded-lg text-xs transition cursor-pointer">Ubah</button>
-          <button data-action="hapus" data-index="${i}" class="text-white/30 hover:text-red-300 hover:bg-red-500/20 px-3 py-1 rounded-lg text-xs transition cursor-pointer">Hapus</button>
+          <button data-action="edit" data-index="${item.i}" class="text-blue-300 hover:bg-blue-500/20 px-3 py-1 rounded-lg text-xs transition cursor-pointer">Ubah</button>
+          <button data-action="hapus" data-index="${item.i}" class="text-white/30 hover:text-red-300 hover:bg-red-500/20 px-3 py-1 rounded-lg text-xs transition cursor-pointer">Hapus</button>
         </div>
       </td>
     </tr>`).join('');
 
   // Mobile card rows
-  mobile.innerHTML = barang.map((item, i) => `
+  mobile.innerHTML = filtered.map((item) => `
     <div class="p-4 space-y-3">
       <div class="flex items-center justify-between">
         <p class="text-white font-semibold">${item.nama}</p>
@@ -626,10 +632,10 @@ function renderTable() {
         </div>
       </div>
       <div class="flex gap-2 flex-wrap">
-        <button data-action="masuk" data-index="${i}" class="flex-1 bg-emerald-500/30 hover:bg-emerald-500/50 text-emerald-300 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">+ Masuk</button>
-        <button data-action="keluar" data-index="${i}" class="flex-1 bg-red-500/30 hover:bg-red-500/50 text-red-300 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">− Keluar</button>
-        <button data-action="edit" data-index="${i}" class="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 py-2 rounded-xl text-xs transition cursor-pointer">Ubah</button>
-        <button data-action="hapus" data-index="${i}" class="bg-white/10 hover:bg-red-500/20 text-white/40 hover:text-red-300 px-3 py-2 rounded-xl text-xs transition cursor-pointer">🗑️</button>
+        <button data-action="masuk" data-index="${item.i}" class="flex-1 bg-emerald-500/30 hover:bg-emerald-500/50 text-emerald-300 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">+ Masuk</button>
+        <button data-action="keluar" data-index="${item.i}" class="flex-1 bg-red-500/30 hover:bg-red-500/50 text-red-300 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">− Keluar</button>
+        <button data-action="edit" data-index="${item.i}" class="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 py-2 rounded-xl text-xs transition cursor-pointer">Ubah</button>
+        <button data-action="hapus" data-index="${item.i}" class="bg-white/10 hover:bg-red-500/20 text-white/40 hover:text-red-300 px-3 py-2 rounded-xl text-xs transition cursor-pointer">🗑️</button>
       </div>
     </div>`).join('');
 }

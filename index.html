@@ -280,7 +280,15 @@
         </div>
 
         <!-- Panel: Stok -->
-        <div id="panelStok" class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
+        <div id="panelStok" class="space-y-3">
+          <!-- Search bar -->
+          <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl px-4 py-3 flex items-center gap-3">
+            <span class="text-white/50">🔍</span>
+            <input type="text" id="searchBarang" placeholder="Cari barang..." oninput="renderTable()"
+              class="flex-1 bg-transparent text-white placeholder-white/50 outline-none text-sm">
+            <button onclick="document.getElementById('searchBarang').value='';renderTable()" class="text-white/30 hover:text-white text-lg leading-none cursor-pointer">×</button>
+          </div>
+          <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
           <!-- Desktop: tabel -->
           <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm text-white">
@@ -301,6 +309,7 @@
           <!-- Mobile: card list -->
           <div id="listBarangMobile" class="md:hidden divide-y divide-white/10"></div>
           <div id="emptyState" class="py-12 text-center text-white/70 text-sm">Belum ada barang. Tambahkan sekarang ✨</div>
+          </div>
         </div>
 
         <!-- Panel: Kelola Jasa -->
