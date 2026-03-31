@@ -394,9 +394,10 @@ function tampilNota({ noNota, waktu, pelanggan, items }) {
 function closeNota() { document.getElementById('modalNota').classList.add('hidden'); }
 
 function cetakNota() {
-  document.getElementById('printArea').innerHTML =
-    document.getElementById('notaContent').innerHTML;
-  window.print();
+  const area = document.getElementById('printArea');
+  area.innerHTML = document.getElementById('notaContent').innerHTML;
+  // Beri waktu browser render dulu sebelum print
+  setTimeout(() => window.print(), 100);
 }
 
 // ── Sidebar toggle ────────────────────────────────────────────────────
