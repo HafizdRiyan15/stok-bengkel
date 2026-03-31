@@ -575,8 +575,12 @@ function renderDashboard() {
 }
 
 function renderTable() {
-  const tbody = document.getElementById('listBarang');
-  document.getElementById('emptyState').style.display = barang.length ? 'none' : 'block';
+  const tbody  = document.getElementById('listBarang');
+  const mobile = document.getElementById('listBarangMobile');
+  const empty  = document.getElementById('emptyState');
+  empty.style.display = barang.length ? 'none' : 'block';
+
+  // Desktop tabel rows
   tbody.innerHTML = barang.map((item, i) => `
     <tr class="hover:bg-white/10 transition">
       <td class="px-4 py-3 font-medium">${item.nama}</td>
@@ -599,6 +603,35 @@ function renderTable() {
         </div>
       </td>
     </tr>`).join('');
+
+  // Mobile card rows
+  mobile.innerHTML = barang.map((item, i) => `
+    <div class="p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <p class="text-white font-semibold">${item.nama}</p>
+        <span class="px-3 py-1 rounded-full text-xs font-bold ${item.stok===0?'bg-red-500/30 text-red-300':item.stok<=3?'bg-yellow-500/30 text-yellow-300':'bg-white/20 text-white'}">${item.stok} unit</span>
+      </div>
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <div class="bg-white/5 rounded-xl p-2 text-center">
+          <p class="text-white/60 mb-1">Harga Beli</p>
+          <p class="text-blue-300 font-semibold">Rp ${item.hargaBeli.toLocaleString('id-ID')}</p>
+        </div>
+        <div class="bg-white/5 rounded-xl p-2 text-center">
+          <p class="text-white/60 mb-1">Harga Jual</p>
+          <p class="text-emerald-300 font-semibold">Rp ${item.hargaJual.toLocaleString('id-ID')}</p>
+        </div>
+        <div class="bg-white/5 rounded-xl p-2 text-center">
+          <p class="text-white/60 mb-1">Nilai Stok</p>
+          <p class="text-white/80 font-semibold">Rp ${(item.stok*item.hargaBeli).toLocaleString('id-ID')}</p>
+        </div>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <button data-action="masuk" data-index="${i}" class="flex-1 bg-emerald-500/30 hover:bg-emerald-500/50 text-emerald-300 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">+ Masuk</button>
+        <button data-action="keluar" data-index="${i}" class="flex-1 bg-red-500/30 hover:bg-red-500/50 text-red-300 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">− Keluar</button>
+        <button data-action="edit" data-index="${i}" class="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 py-2 rounded-xl text-xs transition cursor-pointer">Ubah</button>
+        <button data-action="hapus" data-index="${i}" class="bg-white/10 hover:bg-red-500/20 text-white/40 hover:text-red-300 px-3 py-2 rounded-xl text-xs transition cursor-pointer">🗑️</button>
+      </div>
+    </div>`).join('');
 }
 
 function renderJasa() {

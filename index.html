@@ -281,10 +281,11 @@
 
         <!-- Panel: Stok -->
         <div id="panelStok" class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl overflow-hidden">
-          <div class="overflow-x-auto">
+          <!-- Desktop: tabel -->
+          <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm text-white">
               <thead>
-                <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
+                <tr class="bg-white/10 text-white/80 uppercase text-xs tracking-wider">
                   <th class="px-4 py-3 text-left">Nama</th>
                   <th class="px-4 py-3 text-center">Stok</th>
                   <th class="px-4 py-3 text-right">Harga Beli</th>
@@ -296,8 +297,10 @@
               </thead>
               <tbody id="listBarang" class="divide-y divide-white/10"></tbody>
             </table>
-            <div id="emptyState" class="py-12 text-center text-white/40 text-sm">Belum ada barang. Tambahkan sekarang ✨</div>
           </div>
+          <!-- Mobile: card list -->
+          <div id="listBarangMobile" class="md:hidden divide-y divide-white/10"></div>
+          <div id="emptyState" class="py-12 text-center text-white/70 text-sm">Belum ada barang. Tambahkan sekarang ✨</div>
         </div>
 
         <!-- Panel: Kelola Jasa -->
