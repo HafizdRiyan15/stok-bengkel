@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stok Bengkel</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 flex items-start justify-center p-6 font-sans">
+
+  <!-- Blobs -->
+  <div class="fixed top-[-80px] left-[-80px] w-72 h-72 bg-pink-400 rounded-full opacity-30 blur-3xl pointer-events-none"></div>
+  <div class="fixed bottom-[-80px] right-[-80px] w-96 h-96 bg-blue-400 rounded-full opacity-30 blur-3xl pointer-events-none"></div>
+
+  <div class="w-full max-w-4xl backdrop-blur-xl bg-white/15 border border-white/25 rounded-3xl shadow-2xl p-8 mt-4">
+
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-6">
+      <span class="text-4xl">🔧</span>
+      <div>
+        <h1 class="text-2xl font-bold text-white tracking-wide">Stok Sparepart Bengkel</h1>
+        <p class="text-white/60 text-sm">Kelola inventaris dengan mudah</p>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
+        <p class="text-white/50 text-xs uppercase tracking-wider mb-1">Total Barang</p>
+        <p id="sumJenisBarang" class="text-white text-2xl font-bold">0</p>
+        <p class="text-white/40 text-xs mt-1">jenis</p>
+      </div>
+      <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
+        <p class="text-white/50 text-xs uppercase tracking-wider mb-1">Stok Tersedia</p>
+        <p id="sumStokTotal" class="text-white text-2xl font-bold">0</p>
+        <p class="text-white/40 text-xs mt-1">unit</p>
+      </div>
+      <div class="bg-emerald-500/20 border border-emerald-400/30 rounded-2xl p-4 text-center">
+        <p class="text-emerald-300/70 text-xs uppercase tracking-wider mb-1">Total Masuk</p>
+        <p id="sumUnitMasuk" class="text-emerald-300 text-xl font-bold">0</p>
+        <p id="sumNilaiMasuk" class="text-emerald-300/60 text-xs mt-1">Rp 0</p>
+      </div>
+      <div class="bg-red-500/20 border border-red-400/30 rounded-2xl p-4 text-center">
+        <p class="text-red-300/70 text-xs uppercase tracking-wider mb-1">Total Keluar</p>
+        <p id="sumUnitKeluar" class="text-red-300 text-xl font-bold">0</p>
+        <p id="sumNilaiKeluar" class="text-red-300/60 text-xs mt-1">Rp 0</p>
+      </div>
+    </div>
+
+    <!-- Form Tambah Barang -->
+    <div class="bg-white/10 border border-white/20 rounded-2xl p-4 mb-6">
+      <p class="text-white/60 text-xs uppercase tracking-wider mb-3">Tambah Barang Baru</p>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <input type="text" id="nama" placeholder="Nama Barang"
+          class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 focus:bg-white/20 transition">
+        <input type="number" id="stokAwal" placeholder="Stok Awal" min="0"
+          class="w-full sm:w-28 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 focus:bg-white/20 transition">
+        <input type="number" id="hargaBeli" placeholder="Harga Beli" min="0"
+          class="w-full sm:w-36 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 focus:bg-white/20 transition">
+        <input type="number" id="hargaJual" placeholder="Harga Jual" min="0"
+          class="w-full sm:w-36 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 focus:bg-white/20 transition">
+        <button onclick="tambahBarang()"
+          class="bg-white/90 hover:bg-white text-purple-700 font-semibold px-6 py-3 rounded-xl transition shadow-lg cursor-pointer whitespace-nowrap">
+          + Tambah
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-4 flex-wrap">
+      <button id="tabStok" onclick="switchTab('stok')"
+        class="px-5 py-2 rounded-xl text-sm font-semibold transition cursor-pointer bg-white text-purple-700 shadow">
+        📦 Stok Barang
+      </button>
+      <button id="tabKeluar" onclick="switchTab('keluar')"
+        class="px-5 py-2 rounded-xl text-sm font-semibold transition cursor-pointer bg-white/10 text-white/70 hover:bg-white/20">
+        📤 Barang Keluar
+      </button>
+      <button id="tabRiwayat" onclick="switchTab('riwayat')"
+        class="px-5 py-2 rounded-xl text-sm font-semibold transition cursor-pointer bg-white/10 text-white/70 hover:bg-white/20">
+        📋 Riwayat Transaksi
+      </button>
+    </div>
+
+    <!-- Panel: Stok -->
+    <div id="panelStok">
+      <div class="overflow-x-auto rounded-2xl border border-white/20">
+        <table class="w-full text-sm text-white">
+          <thead>
+            <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
+              <th class="px-4 py-3 text-left">Nama</th>
+              <th class="px-4 py-3 text-center">Stok</th>
+              <th class="px-4 py-3 text-right">Harga Beli</th>
+              <th class="px-4 py-3 text-right">Harga Jual</th>
+              <th class="px-4 py-3 text-right">Nilai Stok</th>
+              <th class="px-4 py-3 text-center">Transaksi</th>
+              <th class="px-4 py-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="listBarang" class="divide-y divide-white/10"></tbody>
+        </table>
+        <div id="emptyState" class="py-12 text-center text-white/40 text-sm">
+          Belum ada barang. Tambahkan sekarang ✨
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel: Barang Keluar -->
+    <div id="panelKeluar" class="hidden">
+      <div class="overflow-x-auto rounded-2xl border border-white/20">
+        <table class="w-full text-sm text-white">
+          <thead>
+            <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
+              <th class="px-4 py-3 text-left">Nama Barang</th>
+              <th class="px-4 py-3 text-center">Total Unit Keluar</th>
+              <th class="px-4 py-3 text-right">Harga Jual</th>
+              <th class="px-4 py-3 text-right">Total Nilai Keluar</th>
+              <th class="px-4 py-3 text-center">Aksi Keluar</th>
+            </tr>
+          </thead>
+          <tbody id="listKeluar" class="divide-y divide-white/10"></tbody>
+        </table>
+        <div id="emptyKeluar" class="py-12 text-center text-white/40 text-sm">
+          Belum ada transaksi keluar ✨
+        </div>
+      </div>
+      <!-- Total Nilai Keluar -->
+      <div class="mt-4 flex justify-end">
+        <div class="bg-red-500/20 border border-red-400/30 rounded-2xl px-6 py-4 text-right">
+          <p class="text-red-300/70 text-xs uppercase tracking-wider mb-1">Grand Total Keluar</p>
+          <p id="grandTotalKeluar" class="text-red-300 text-2xl font-bold">Rp 0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel: Riwayat -->
+    <div id="panelRiwayat" class="hidden">
+      <div class="overflow-x-auto rounded-2xl border border-white/20">
+        <table class="w-full text-sm text-white">
+          <thead>
+            <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
+              <th class="px-4 py-3 text-left">Waktu</th>
+              <th class="px-4 py-3 text-left">Barang</th>
+              <th class="px-4 py-3 text-center">Tipe</th>
+              <th class="px-4 py-3 text-center">Jumlah</th>
+              <th class="px-4 py-3 text-right">Harga Satuan</th>
+              <th class="px-4 py-3 text-right">Total Harga</th>
+              <th class="px-4 py-3 text-left">Keterangan</th>
+            </tr>
+          </thead>
+          <tbody id="listRiwayat" class="divide-y divide-white/10"></tbody>
+        </table>
+        <div id="emptyRiwayat" class="py-12 text-center text-white/40 text-sm">
+          Belum ada transaksi ✨
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal Transaksi -->
+  <div id="modalOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-indigo-900/80 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-sm shadow-2xl mx-4">
+      <h2 id="modalTitle" class="text-white text-xl font-bold mb-1"></h2>
+      <p id="modalSubtitle" class="text-white/50 text-sm mb-6"></p>
+      <div class="flex flex-col gap-3">
+        <div>
+          <label class="text-white/50 text-xs uppercase tracking-wider mb-1 block">Jumlah</label>
+          <input type="number" id="modalJumlah" placeholder="Masukkan jumlah" min="1"
+            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 transition">
+        </div>
+        <div>
+          <label class="text-white/50 text-xs uppercase tracking-wider mb-1 block" id="modalHargaLabel">Harga Satuan</label>
+          <input type="number" id="modalHarga" placeholder="Harga satuan" min="0"
+            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 transition">
+        </div>
+        <div id="modalTotalWrap" class="bg-white/10 rounded-xl px-4 py-3 flex justify-between items-center">
+          <span class="text-white/50 text-sm">Total</span>
+          <span id="modalTotal" class="text-white font-bold">Rp 0</span>
+        </div>
+        <div>
+          <label class="text-white/50 text-xs uppercase tracking-wider mb-1 block">Keterangan</label>
+          <input type="text" id="modalKeterangan" placeholder="Opsional"
+            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-white/60 transition">
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeModal()"
+          class="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold transition cursor-pointer">
+          Batal
+        </button>
+        <button id="modalConfirm" onclick="konfirmasiTransaksi()"
+          class="flex-1 py-3 rounded-xl font-semibold transition cursor-pointer">
+          Konfirmasi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
