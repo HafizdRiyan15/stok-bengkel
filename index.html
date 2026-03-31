@@ -7,10 +7,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
     @media print {
-      body * { visibility: hidden; }
-      #printArea { visibility: visible; position: fixed; top: 0; left: 0; width: 100%; background: white; padding: 24px; font-family: monospace; font-size: 13px; color: black; }
-      #printArea * { visibility: visible; }
-      #printArea button { display: none; }
+      html, body { margin: 0; padding: 0; background: white; }
+      body > * { display: none !important; }
+      #printArea { display: block !important; font-family: monospace; font-size: 13px; color: black; padding: 20px; max-width: 400px; margin: auto; }
+      #printArea button { display: none !important; }
     }
   </style>
 </head>
