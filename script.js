@@ -221,7 +221,12 @@ function konfirmasiTransaksi() {
   if (tipe === 'keluar' && jumlah > item.stok) {
     alert(`Stok tidak cukup! Tersedia: ${item.stok}`); return;
   }
-  if (tipe === 'masuk') { item.stok += jumlah; item.hargaBeli = harga; }
+  if (tipe === 'masuk') {
+    const totalNilaiLama = item.stok * item.hargaBeli;
+    const totalNilaiBaru = jumlah * harga;
+    item.stok     += jumlah;
+    item.hargaBeli = Math.round((totalNilaiLama + totalNilaiBaru) / item.stok);
+  }
   else                  { item.stok -= jumlah; item.hargaJual = harga; }
 
   riwayat.unshift({ waktu: now(), nama: item.nama, tipe, jumlah,
