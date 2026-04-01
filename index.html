@@ -541,7 +541,8 @@
               <p class="text-white font-semibold">Detail Transaksi</p>
               <p id="lapPeriodeLabel" class="text-white/70 text-xs mt-1">Hari ini</p>
             </div>
-            <div class="overflow-x-auto">
+            <!-- Desktop tabel -->
+            <div class="hidden md:block overflow-x-auto">
               <table class="w-full text-sm text-white">
                 <thead>
                   <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
@@ -554,8 +555,10 @@
                 </thead>
                 <tbody id="lapTabel" class="divide-y divide-white/10"></tbody>
               </table>
-              <div id="lapEmpty" class="py-12 text-center text-white/40 text-sm">Tidak ada transaksi pada periode ini</div>
             </div>
+            <!-- Mobile card -->
+            <div id="lapTabelMobile" class="md:hidden divide-y divide-white/10"></div>
+            <div id="lapEmpty" class="py-12 text-center text-white/40 text-sm">Tidak ada transaksi pada periode ini</div>
           </div>
         </div>
 

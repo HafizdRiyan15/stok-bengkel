@@ -824,6 +824,20 @@ function renderLaporan() {
       <td class="px-4 py-3 text-center text-white/70">${r.jumlah}</td>
       <td class="px-4 py-3 text-right font-semibold ${warna[r.tipe]||''}">Rp ${r.totalHarga.toLocaleString('id-ID')}</td>
     </tr>`).join('');
+
+  // Mobile card
+  const mobile = document.getElementById('lapTabelMobile');
+  if (mobile) mobile.innerHTML = data.map(r => `
+    <div class="px-4 py-3 flex items-center justify-between gap-3">
+      <div class="min-w-0 flex-1">
+        <p class="text-white text-sm font-medium truncate">${r.nama}</p>
+        <p class="text-white/50 text-xs">${r.waktu}</p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-white/10 ${warna[r.tipe]||''}">${label[r.tipe]||r.tipe}</span>
+        <span class="font-semibold text-sm ${warna[r.tipe]||''}">Rp ${r.totalHarga.toLocaleString('id-ID')}</span>
+      </div>
+    </div>`).join('');
 }
 
 // ── Notifikasi Stok Kritis ────────────────────────────────────────────
