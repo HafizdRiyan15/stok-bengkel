@@ -439,7 +439,7 @@ function switchTab(tab) {
   tabs.forEach(t => {
     document.getElementById('nav' + t.charAt(0).toUpperCase() + t.slice(1)).className =
       'w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition cursor-pointer text-left ' +
-      (t === tab ? 'bg-white text-purple-700 shadow-lg' : 'text-white/70 hover:bg-white/10');
+      (t === tab ? 'bg-cyan-500 text-slate-900 shadow-lg' : 'text-slate-300 hover:bg-cyan-900/30 hover:text-white');
   });
 
   document.getElementById('pageTitle').textContent    = tabMeta[tab].title;
