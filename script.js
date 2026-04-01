@@ -86,6 +86,7 @@ function tambahBarang() {
   const keterangan = kategori === 'Lainnya' ? (ketManual || 'Lainnya') : kategori;
 
   if (!nama)                             { alert('Nama barang wajib diisi!'); return; }
+  if (stokAwal < 0)                      { alert('Stok awal tidak boleh negatif!'); return; }
   if (isNaN(hargaBeli) || hargaBeli < 0) { alert('Harga beli wajib diisi!'); return; }
   if (isNaN(hargaJual) || hargaJual < 0) { alert('Harga jual wajib diisi!'); return; }
   if (barang.some(b => b.nama.toLowerCase() === nama.toLowerCase())) {
@@ -339,10 +340,16 @@ function renderKeranjang() {
 function prosesTransaksi() {
   if (keranjang.length === 0) { alert('Keranjang masih kosong!'); return; }
 
+  // Guard double-click
+  const btn = document.querySelector('[onclick="prosesTransaksi()"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Memproses...'; }
+
   for (const k of keranjang.filter(k => k.tipe === 'barang')) {
     const item = barang[k.index];
     if (!item || k.qty > item.stok) {
-      alert(`Stok "${k.nama}" tidak cukup! Tersedia: ${item?.stok ?? 0}`); return;
+      alert(`Stok "${k.nama}" tidak cukup! Tersedia: ${item?.stok ?? 0}`);
+      if (btn) { btn.disabled = false; btn.textContent = '✅ Proses Transaksi'; }
+      return;
     }
   }
 
@@ -368,6 +375,7 @@ function prosesTransaksi() {
   tampilNota({ noNota, waktu, pelanggan, items: snapshot });
   keranjang = [];
   document.getElementById('kasirPelanggan').value = '';
+  if (btn) { btn.disabled = false; btn.textContent = '✅ Proses Transaksi'; }
   render();
 }
 
@@ -596,13 +604,15 @@ function renderDashboard() {
 // ── Toggle Filter Habis/Kritis ──────────────────────────────────────
 function toggleFilterHabisKritis() {
   filterHabisKritisAktif = !filterHabisKritisAktif;
+  // Reset dropdown filterStatus agar tidak konflik
+  const sel = document.getElementById('filterStatus');
+  if (sel) sel.value = '';
   const card = document.getElementById('cardHabisKritis');
   if (card) {
     if (filterHabisKritisAktif) {
       card.classList.add('ring-2', 'ring-red-400', 'bg-red-500/40');
       const hint = card.querySelector('p:last-child');
       if (hint) hint.textContent = 'Ketuk untuk reset';
-      // Pindah ke tab stok kalau belum di sana
       if (document.getElementById('panelStok')?.classList.contains('hidden')) {
         switchTab('stok');
       }
