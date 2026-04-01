@@ -282,26 +282,29 @@
         <!-- Panel: Stok -->
         <div id="panelStok" class="space-y-3">
 
+          <!-- Ringkasan total -->
+          <div id="ringkasanStok" class="grid grid-cols-2 gap-3"></div>
+
           <!-- Search + Filter + Sort bar -->
           <div class="bg-slate-800/80 border border-cyan-900/40 rounded-2xl p-3 flex flex-wrap gap-2 items-center">
             <div class="flex items-center gap-2 flex-1 min-w-32 bg-white/10 rounded-xl px-3 py-2">
-              <span class="text-white/50 text-sm">🔍</span>
+              <span class="text-white/50 text-sm">&#128269;</span>
               <input type="text" id="searchBarang" placeholder="Cari barang..." oninput="renderTable()"
                 class="flex-1 bg-transparent text-white placeholder-white/50 outline-none text-sm">
-              <button onclick="document.getElementById('searchBarang').value='';renderTable()" class="text-white/30 hover:text-white text-lg leading-none cursor-pointer">×</button>
+              <button onclick="document.getElementById('searchBarang').value='';renderTable()" class="text-white/30 hover:text-white text-lg leading-none cursor-pointer">&#215;</button>
             </div>
             <select id="filterStatus" onchange="renderTable()"
               class="bg-slate-800 border border-white/20 rounded-xl px-3 py-2 text-white text-sm outline-none cursor-pointer">
               <option value="">Semua Status</option>
-              <option value="habis">🔴 Habis</option>
-              <option value="kritis">🟡 Kritis (≤3)</option>
-              <option value="aman">🟢 Aman</option>
+              <option value="habis">Habis</option>
+              <option value="kritis">Kritis</option>
+              <option value="aman">Aman</option>
             </select>
             <select id="sortBarang" onchange="renderTable()"
               class="bg-slate-800 border border-white/20 rounded-xl px-3 py-2 text-white text-sm outline-none cursor-pointer">
               <option value="">Urutan Default</option>
-              <option value="nama-asc">Nama A–Z</option>
-              <option value="nama-desc">Nama Z–A</option>
+              <option value="nama-asc">Nama A-Z</option>
+              <option value="nama-desc">Nama Z-A</option>
               <option value="stok-asc">Stok Tersedikit</option>
               <option value="stok-desc">Stok Terbanyak</option>
               <option value="harga-asc">Harga Terendah</option>
@@ -311,30 +314,31 @@
 
           <!-- Tabel/Card -->
           <div class="bg-slate-800/80 border border-cyan-900/40 rounded-2xl overflow-hidden">
-          <!-- Desktop: tabel -->
-          <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-sm text-white">
-              <thead>
-                <tr class="bg-white/10 text-white/80 uppercase text-xs tracking-wider">
-                  <th class="px-4 py-3 text-left">Nama</th>
-                  <th class="px-4 py-3 text-center">Stok</th>
-                  <th class="px-4 py-3 text-right">Harga Beli</th>
-                  <th class="px-4 py-3 text-right">Harga Jual</th>
-                  <th class="px-4 py-3 text-right">Nilai Stok</th>
-                  <th class="px-4 py-3 text-center">Transaksi</th>
-                  <th class="px-4 py-3 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="listBarang" class="divide-y divide-white/10"></tbody>
-            </table>
+            <!-- Desktop: tabel -->
+            <div class="hidden md:block overflow-x-auto">
+              <table class="w-full text-sm text-white">
+                <thead>
+                  <tr class="bg-white/10 text-white/80 uppercase text-xs tracking-wider">
+                    <th class="px-4 py-3 text-left">Nama</th>
+                    <th class="px-4 py-3 text-center">Stok</th>
+                    <th class="px-4 py-3 text-right">Harga Beli</th>
+                    <th class="px-4 py-3 text-right">Harga Jual</th>
+                    <th class="px-4 py-3 text-right">Nilai Stok</th>
+                    <th class="px-4 py-3 text-center">Transaksi</th>
+                    <th class="px-4 py-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="listBarang" class="divide-y divide-white/10"></tbody>
+              </table>
+            </div>
+            <!-- Mobile: card list -->
+            <div id="listBarangMobile" class="md:hidden divide-y divide-white/10"></div>
+            <div id="emptyState" class="py-12 text-center text-white/70 text-sm">Belum ada barang. Tambahkan sekarang</div>
           </div>
-          <!-- Mobile: card list -->
-          <div id="listBarangMobile" class="md:hidden divide-y divide-white/10"></div>
-          <div id="emptyState" class="py-12 text-center text-white/70 text-sm">Belum ada barang. Tambahkan sekarang</div>
-          </div>
+
         </div>
 
-        <!-- Panel: Kelola Jasa -->
+                <!-- Panel: Kelola Jasa -->
         <div id="panelJasa" class="hidden space-y-4">
           <div class="bg-slate-800/80 border border-cyan-900/40 rounded-2xl p-5">
             <p class="text-white/80 text-xs uppercase tracking-wider mb-3">Tambah Jasa Baru</p>
