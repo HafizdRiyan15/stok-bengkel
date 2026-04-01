@@ -653,7 +653,7 @@ function renderTable() {
         <button data-action="masuk" data-index="${item.i}" class="flex-1 bg-emerald-500/30 hover:bg-emerald-500/50 text-emerald-300 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">+ Masuk</button>
         <button data-action="keluar" data-index="${item.i}" class="flex-1 bg-red-500/30 hover:bg-red-500/50 text-red-300 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">− Keluar</button>
         <button data-action="edit" data-index="${item.i}" class="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 py-2 rounded-xl text-xs transition cursor-pointer">Ubah</button>
-        <button data-action="hapus" data-index="${item.i}" class="bg-white/10 hover:bg-red-500/20 text-white/40 hover:text-red-300 px-3 py-2 rounded-xl text-xs transition cursor-pointer">🗑️</button>
+        <button data-action="hapus" data-index="${item.i}" class="bg-white/10 hover:bg-red-500/20 text-white/40 hover:text-red-300 px-3 py-2 rounded-xl text-sm font-bold transition cursor-pointer">×</button>
       </div>
     </div>`).join('');
 
@@ -699,7 +699,8 @@ function renderJasa() {
 }
 
 function renderKeluar() {
-  const tbody = document.getElementById('listKeluar');
+  const tbody  = document.getElementById('listKeluar');
+  const mobile = document.getElementById('listKeluarMobile');
   const keluarMap = {};
   riwayat.filter(r => r.tipe === 'keluar').forEach(r => {
     if (!keluarMap[r.nama]) keluarMap[r.nama] = { unit: 0, nilai: 0, hargaJual: 0 };
@@ -710,6 +711,8 @@ function renderKeluar() {
   const entries = Object.entries(keluarMap);
   document.getElementById('emptyKeluar').style.display = entries.length ? 'none' : 'block';
   document.getElementById('grandTotalKeluar').textContent = 'Rp ' + entries.reduce((s,[,v])=>s+v.nilai,0).toLocaleString('id-ID');
+
+  // Desktop tabel
   tbody.innerHTML = entries.map(([nama, data]) => {
     const idx = barang.findIndex(b => b.nama === nama);
     return `<tr class="hover:bg-white/10 transition">
@@ -721,13 +724,30 @@ function renderKeluar() {
         ${idx>=0?`<button data-action="keluar" data-index="${idx}" class="bg-red-500/30 hover:bg-red-500/50 text-red-300 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">− Keluar Lagi</button>`:'<span class="text-white/30 text-xs">Dihapus</span>'}
       </td></tr>`;
   }).join('');
+
+  // Mobile card
+  if (mobile) mobile.innerHTML = entries.map(([nama, data]) => {
+    const idx = barang.findIndex(b => b.nama === nama);
+    return `<div class="p-4 space-y-2">
+      <div class="flex items-center justify-between">
+        <p class="text-white font-semibold">${nama}</p>
+        <span class="bg-red-500/30 text-red-300 px-3 py-1 rounded-full text-xs font-bold">${data.unit} unit</span>
+      </div>
+      <div class="flex justify-between text-xs">
+        <span class="text-white/60">Harga Jual: <span class="text-emerald-300 font-semibold">Rp ${data.hargaJual.toLocaleString('id-ID')}</span></span>
+        <span class="text-red-300 font-semibold">Rp ${data.nilai.toLocaleString('id-ID')}</span>
+      </div>
+      ${idx>=0?`<button data-action="keluar" data-index="${idx}" class="w-full bg-red-500/20 hover:bg-red-500/40 text-red-300 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">− Keluar Lagi</button>`:''}
+    </div>`;
+  }).join('');
 }
 
 function renderRiwayat() {
-  const tbody = document.getElementById('listRiwayat');
-  const cariNama  = (document.getElementById('filterNama')?.value   || '').toLowerCase();
-  const cariTipe  = document.getElementById('filterTipe')?.value    || '';
-  const cariTgl   = document.getElementById('filterTanggal')?.value || '';
+  const tbody  = document.getElementById('listRiwayat');
+  const mobile = document.getElementById('listRiwayatMobile');
+  const cariNama = (document.getElementById('filterNama')?.value  || '').toLowerCase();
+  const cariTipe = document.getElementById('filterTipe')?.value   || '';
+  const cariTgl  = document.getElementById('filterTanggal')?.value || '';
 
   let filtered = riwayat;
   if (cariNama) filtered = filtered.filter(r => r.nama.toLowerCase().includes(cariNama));
@@ -739,9 +759,11 @@ function renderRiwayat() {
 
   document.getElementById('emptyRiwayat').style.display = filtered.length ? 'none' : 'block';
   const warna = { masuk:'bg-emerald-500/30 text-emerald-300', keluar:'bg-red-500/30 text-red-300', jasa:'bg-orange-500/30 text-orange-300' };
-  const label = { masuk:'📥 Masuk', keluar:'📤 Keluar', jasa:'⚙️ Jasa' };
+  const label = { masuk:'Masuk', keluar:'Keluar', jasa:'Jasa' };
   const teks  = { masuk:'text-emerald-300', keluar:'text-red-300', jasa:'text-orange-300' };
-  tbody.innerHTML = filtered.map((r, i) => {
+
+  // Desktop tabel
+  tbody.innerHTML = filtered.map((r) => {
     const realIdx = riwayat.indexOf(r);
     return `<tr class="hover:bg-white/10 transition">
       <td class="px-4 py-3 text-white/50 text-xs whitespace-nowrap">${r.waktu}</td>
@@ -752,9 +774,28 @@ function renderRiwayat() {
       <td class="px-4 py-3 text-right font-semibold ${teks[r.tipe]||''}">Rp ${r.totalHarga.toLocaleString('id-ID')}</td>
       <td class="px-4 py-3 text-white/50 text-sm">${r.keterangan}</td>
       <td class="px-4 py-3 text-center">
-        <button onclick="hapusRiwayat(${realIdx})" class="text-white/20 hover:text-red-300 hover:bg-red-500/20 px-2 py-1 rounded-lg text-xs transition cursor-pointer">🗑️</button>
+        <button onclick="hapusRiwayat(${realIdx})" class="text-white/30 hover:text-red-300 hover:bg-red-500/20 w-7 h-7 rounded-lg text-sm transition cursor-pointer">×</button>
       </td>
     </tr>`;
+  }).join('');
+
+  // Mobile card
+  if (mobile) mobile.innerHTML = filtered.map((r) => {
+    const realIdx = riwayat.indexOf(r);
+    return `<div class="px-4 py-3 space-y-1">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+          <span class="px-2 py-0.5 rounded-full text-xs font-semibold shrink-0 ${warna[r.tipe]||warna.keluar}">${label[r.tipe]||r.tipe}</span>
+          <p class="text-white font-medium text-sm truncate">${r.nama}</p>
+        </div>
+        <button onclick="hapusRiwayat(${realIdx})" class="text-white/30 hover:text-red-300 text-lg leading-none cursor-pointer shrink-0">×</button>
+      </div>
+      <div class="flex justify-between text-xs">
+        <span class="text-white/50">${r.waktu} · ${r.jumlah} unit</span>
+        <span class="font-semibold ${teks[r.tipe]||''}">Rp ${r.totalHarga.toLocaleString('id-ID')}</span>
+      </div>
+      <p class="text-white/40 text-xs truncate">${r.keterangan}</p>
+    </div>`;
   }).join('');
 }
 

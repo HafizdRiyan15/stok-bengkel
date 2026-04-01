@@ -426,21 +426,24 @@
         <!-- Panel: Barang Keluar -->
         <div id="panelKeluar" class="hidden space-y-4">
           <div class="bg-slate-800/80 border border-cyan-900/40 rounded-2xl overflow-hidden">
-            <div class="overflow-x-auto">
+            <!-- Desktop tabel -->
+            <div class="hidden md:block overflow-x-auto">
               <table class="w-full text-sm text-white">
                 <thead>
                   <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
                     <th class="px-4 py-3 text-left">Nama Barang</th>
-                    <th class="px-4 py-3 text-center">Total Unit Keluar</th>
+                    <th class="px-4 py-3 text-center">Total Unit</th>
                     <th class="px-4 py-3 text-right">Harga Jual</th>
-                    <th class="px-4 py-3 text-right">Total Nilai Keluar</th>
+                    <th class="px-4 py-3 text-right">Total Nilai</th>
                     <th class="px-4 py-3 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="listKeluar" class="divide-y divide-white/10"></tbody>
               </table>
-              <div id="emptyKeluar" class="py-12 text-center text-white/40 text-sm">Belum ada transaksi keluar ✨</div>
             </div>
+            <!-- Mobile card -->
+            <div id="listKeluarMobile" class="md:hidden divide-y divide-white/10"></div>
+            <div id="emptyKeluar" class="py-12 text-center text-white/40 text-sm">Belum ada transaksi keluar</div>
           </div>
           <div class="flex justify-end">
             <div class="bg-red-500/20 border border-red-400/30 rounded-2xl px-6 py-4 text-right">
@@ -453,29 +456,34 @@
         <!-- Panel: Riwayat -->
         <div id="panelRiwayat" class="hidden space-y-4">
           <!-- Filter bar -->
-          <div class="bg-slate-800/80 border border-cyan-900/40 rounded-2xl p-4 flex flex-wrap gap-3 items-center">
-            <input type="text" id="filterNama" placeholder="Cari nama..." oninput="renderRiwayat()"
-              class="flex-1 min-w-32 bg-white/15 border border-white/30 rounded-xl px-3 py-2 text-white placeholder-white/60 outline-none focus:border-white/60 text-sm transition">
+          <div class="bg-slate-800/80 border border-cyan-900/40 rounded-2xl p-3 flex flex-wrap gap-2 items-center">
+            <div class="flex items-center gap-2 flex-1 min-w-28 bg-white/10 rounded-xl px-3 py-2">
+              <span class="text-white/50 text-sm">🔍</span>
+              <input type="text" id="filterNama" placeholder="Cari nama..." oninput="renderRiwayat()"
+                class="flex-1 bg-transparent text-white placeholder-white/50 outline-none text-sm">
+            </div>
             <select id="filterTipe" onchange="renderRiwayat()"
-              class="bg-slate-800 border border-white/30 rounded-xl px-3 py-2 text-white text-sm outline-none cursor-pointer">
+              class="bg-slate-800 border border-white/20 rounded-xl px-3 py-2 text-white text-sm outline-none cursor-pointer">
               <option value="">Semua Tipe</option>
-              <option value="masuk">📥 Masuk</option>
-              <option value="keluar">📤 Keluar</option>
-              <option value="jasa">⚙️ Jasa</option>
+              <option value="masuk">Masuk</option>
+              <option value="keluar">Keluar</option>
+              <option value="jasa">Jasa</option>
             </select>
             <input type="date" id="filterTanggal" onchange="renderRiwayat()"
-              class="bg-slate-800 border border-white/30 rounded-xl px-3 py-2 text-white text-sm outline-none cursor-pointer">
+              class="bg-slate-800 border border-white/20 rounded-xl px-3 py-2 text-white text-sm outline-none cursor-pointer">
             <button onclick="resetFilterRiwayat()"
-              class="bg-white/10 hover:bg-white/20 text-white/60 hover:text-white px-4 py-2 rounded-xl text-sm transition cursor-pointer">
+              class="bg-white/10 hover:bg-white/20 text-white/70 px-3 py-2 rounded-xl text-sm transition cursor-pointer">
               Reset
             </button>
             <button onclick="hapusSemuaRiwayat()"
-              class="bg-red-500/20 hover:bg-red-500/40 text-red-300 px-4 py-2 rounded-xl text-sm transition cursor-pointer">
-              🗑️ Hapus Semua
+              class="bg-red-500/20 hover:bg-red-500/40 text-red-300 px-3 py-2 rounded-xl text-sm transition cursor-pointer">
+              Hapus Semua
             </button>
           </div>
+
+          <!-- Desktop tabel -->
           <div class="bg-slate-800/80 border border-cyan-900/40 rounded-2xl overflow-hidden">
-            <div class="overflow-x-auto">
+            <div class="hidden md:block overflow-x-auto">
               <table class="w-full text-sm text-white">
                 <thead>
                   <tr class="bg-white/10 text-white/60 uppercase text-xs tracking-wider">
@@ -491,8 +499,10 @@
                 </thead>
                 <tbody id="listRiwayat" class="divide-y divide-white/10"></tbody>
               </table>
-              <div id="emptyRiwayat" class="py-12 text-center text-white/40 text-sm">Belum ada transaksi ✨</div>
             </div>
+            <!-- Mobile card -->
+            <div id="listRiwayatMobile" class="md:hidden divide-y divide-white/10"></div>
+            <div id="emptyRiwayat" class="py-12 text-center text-white/40 text-sm">Belum ada transaksi</div>
           </div>
         </div>
 
@@ -571,7 +581,6 @@
     <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl mx-4 overflow-y-auto max-h-[90vh]">
       <div id="notaContent" class="p-6">
         <div class="text-center mb-4">
-          <p class="text-2xl">🔧</p>
           <h2 class="font-bold text-gray-800 text-lg" id="notaNamaBengkel">Bengkel Sparepart</h2>
           <p class="text-gray-400 text-xs" id="notaWaktu"></p>
           <p class="text-gray-500 text-xs mt-1">No. <span id="notaNo" class="font-mono font-bold"></span></p>
@@ -608,7 +617,7 @@
           <span>GRAND TOTAL</span><span id="notaTotal"></span>
         </div>
         <div class="border-t border-dashed border-gray-300 my-3"></div>
-        <p class="text-center text-gray-400 text-xs">Terima kasih atas kunjungan Anda 🙏</p>
+        <p class="text-center text-gray-400 text-xs">Terima kasih atas kunjungan Anda</p>
       </div>
       <div class="flex gap-3 p-4 bg-gray-50 border-t border-gray-100">
         <button onclick="closeNota()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-xl font-semibold text-sm transition cursor-pointer">Tutup</button>
