@@ -500,6 +500,8 @@ function renderDashboard() {
   elNilaiKeluar.textContent = fmtRp(nilaiKeluar);
   elNilaiMasuk.title  = fmtFull(nilaiMasuk);
   elNilaiKeluar.title = fmtFull(nilaiKeluar);
+  document.getElementById('dbNilaiMasukFull').textContent  = fmtFull(nilaiMasuk);
+  document.getElementById('dbNilaiKeluarFull').textContent = fmtFull(nilaiKeluar);
   document.getElementById('dbUnitMasuk').textContent   = uMasuk + ' unit';
   document.getElementById('dbUnitKeluar').textContent  = uKeluar + ' unit';
 
