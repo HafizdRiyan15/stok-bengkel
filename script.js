@@ -6,6 +6,16 @@ let keranjang   = [];
 let periodeAktif = 'hari';
 let namaBengkel = 'Bengkel';
 
+// ── Format Angka ──────────────────────────────────────────────────────
+function fmt(n) {
+  if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
+  if (n >= 1_000_000)     return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1_000)         return (n / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+  return n.toLocaleString('id-ID');
+}
+function fmtRp(n)  { return 'Rp ' + fmt(n); }
+function fmtFull(n){ return 'Rp ' + n.toLocaleString('id-ID'); }
+
 // ── Persistensi localStorage ─────────────────────────────────────────
 function simpanData() {
   localStorage.setItem('bengkel_barang',  JSON.stringify(barang));
@@ -482,8 +492,14 @@ function renderDashboard() {
 
   document.getElementById('dbTotalBarang').textContent = barang.length;
   document.getElementById('dbTotalStok').textContent   = barang.reduce((s,b)=>s+b.stok,0);
-  document.getElementById('dbNilaiMasuk').textContent  = 'Rp ' + nilaiMasuk.toLocaleString('id-ID');
-  document.getElementById('dbNilaiKeluar').textContent = 'Rp ' + nilaiKeluar.toLocaleString('id-ID');
+
+  // Format ringkas + tooltip angka penuh
+  const elNilaiMasuk  = document.getElementById('dbNilaiMasuk');
+  const elNilaiKeluar = document.getElementById('dbNilaiKeluar');
+  elNilaiMasuk.textContent  = fmtRp(nilaiMasuk);
+  elNilaiKeluar.textContent = fmtRp(nilaiKeluar);
+  elNilaiMasuk.title  = fmtFull(nilaiMasuk);
+  elNilaiKeluar.title = fmtFull(nilaiKeluar);
   document.getElementById('dbUnitMasuk').textContent   = uMasuk + ' unit';
   document.getElementById('dbUnitKeluar').textContent  = uKeluar + ' unit';
 
@@ -646,7 +662,7 @@ function renderTable() {
         </div>
         <div class="bg-white/5 rounded-xl p-2 text-center">
           <p class="text-white/60 mb-1">Nilai Stok</p>
-          <p class="text-white/80 font-semibold">Rp ${(item.stok*item.hargaBeli).toLocaleString('id-ID')}</p>
+          <p class="text-white/80 font-semibold truncate" title="${fmtFull(item.stok*item.hargaBeli)}">${fmtRp(item.stok*item.hargaBeli)}</p>
         </div>
       </div>
       <div class="flex gap-2 flex-wrap">
@@ -664,21 +680,25 @@ function renderTable() {
   const jmlKritis  = barang.filter(b => b.stok > 0 && b.stok <= 3).length;
   const ring = document.getElementById('ringkasanStok');
   if (ring) ring.innerHTML = `
-    <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
-      <p class="text-white/70 text-xs uppercase tracking-wider mb-1">Total Jenis</p>
-      <p class="text-white text-xl font-bold">${barang.length}</p>
+    <div class="bg-slate-800/80 border border-cyan-900/40 rounded-2xl p-4 text-center min-w-0">
+      <p class="text-white/70 text-xs uppercase tracking-wider mb-1 truncate">Total Jenis</p>
+      <p class="text-white text-2xl font-bold">${barang.length}</p>
+      <p class="text-white/50 text-xs mt-1">jenis</p>
     </div>
-    <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
-      <p class="text-white/70 text-xs uppercase tracking-wider mb-1">Total Unit</p>
-      <p class="text-white text-xl font-bold">${totalUnit}</p>
+    <div class="bg-slate-800/80 border border-cyan-900/40 rounded-2xl p-4 text-center min-w-0">
+      <p class="text-white/70 text-xs uppercase tracking-wider mb-1 truncate">Total Unit</p>
+      <p class="text-white text-2xl font-bold">${totalUnit.toLocaleString('id-ID')}</p>
+      <p class="text-white/50 text-xs mt-1">unit</p>
     </div>
-    <div class="bg-emerald-500/20 border border-emerald-400/30 rounded-2xl p-4 text-center">
-      <p class="text-emerald-300/70 text-xs uppercase tracking-wider mb-1">Nilai Stok</p>
-      <p class="text-emerald-300 text-xl font-bold">Rp ${totalNilai.toLocaleString('id-ID')}</p>
+    <div class="bg-emerald-500/20 border border-emerald-400/30 rounded-2xl p-4 text-center min-w-0">
+      <p class="text-emerald-300/70 text-xs uppercase tracking-wider mb-1 truncate">Nilai Stok</p>
+      <p class="text-emerald-300 text-2xl font-bold truncate" title="${fmtFull(totalNilai)}">${fmtRp(totalNilai)}</p>
+      <p class="text-emerald-300/50 text-xs mt-1 truncate">${fmtFull(totalNilai)}</p>
     </div>
-    <div class="bg-red-500/20 border border-red-400/30 rounded-2xl p-4 text-center">
-      <p class="text-red-300/70 text-xs uppercase tracking-wider mb-1">Habis / Kritis</p>
-      <p class="text-red-300 text-xl font-bold">${jmlHabis} / <span class="text-yellow-300">${jmlKritis}</span></p>
+    <div class="bg-red-500/20 border border-red-400/30 rounded-2xl p-4 text-center min-w-0">
+      <p class="text-red-300/70 text-xs uppercase tracking-wider mb-1 truncate">Habis / Kritis</p>
+      <p class="text-red-300 text-2xl font-bold">${jmlHabis} / <span class="text-yellow-300">${jmlKritis}</span></p>
+      <p class="text-white/50 text-xs mt-1">barang</p>
     </div>`;
 }
 
