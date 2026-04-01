@@ -579,14 +579,30 @@ function renderTable() {
   const mobile = document.getElementById('listBarangMobile');
   const empty  = document.getElementById('emptyState');
   const cari   = (document.getElementById('searchBarang')?.value || '').toLowerCase().trim();
+  const status = document.getElementById('filterStatus')?.value || '';
+  const sort   = document.getElementById('sortBarang')?.value   || '';
 
-  const filtered = barang
-    .map((item, i) => ({ ...item, i }))
-    .filter(item => !cari || item.nama.toLowerCase().includes(cari));
+  let filtered = barang.map((item, i) => ({ ...item, i }));
+
+  // Filter nama
+  if (cari) filtered = filtered.filter(item => item.nama.toLowerCase().includes(cari));
+
+  // Filter status
+  if (status === 'habis')   filtered = filtered.filter(item => item.stok === 0);
+  if (status === 'kritis')  filtered = filtered.filter(item => item.stok > 0 && item.stok <= 3);
+  if (status === 'aman')    filtered = filtered.filter(item => item.stok > 3);
+
+  // Sort
+  if (sort === 'nama-asc')    filtered.sort((a,b) => a.nama.localeCompare(b.nama));
+  if (sort === 'nama-desc')   filtered.sort((a,b) => b.nama.localeCompare(a.nama));
+  if (sort === 'stok-asc')    filtered.sort((a,b) => a.stok - b.stok);
+  if (sort === 'stok-desc')   filtered.sort((a,b) => b.stok - a.stok);
+  if (sort === 'harga-asc')   filtered.sort((a,b) => a.hargaJual - b.hargaJual);
+  if (sort === 'harga-desc')  filtered.sort((a,b) => b.hargaJual - a.hargaJual);
 
   empty.style.display = (barang.length === 0 || filtered.length === 0) ? 'block' : 'none';
   if (barang.length === 0) empty.textContent = 'Belum ada barang. Tambahkan sekarang ✨';
-  else if (filtered.length === 0) empty.textContent = `Barang "${cari}" tidak ditemukan`;
+  else if (filtered.length === 0) empty.textContent = `Tidak ada barang yang cocok`;
 
   // Desktop tabel rows
   tbody.innerHTML = filtered.map((item) => `
@@ -640,6 +656,30 @@ function renderTable() {
         <button data-action="hapus" data-index="${item.i}" class="bg-white/10 hover:bg-red-500/20 text-white/40 hover:text-red-300 px-3 py-2 rounded-xl text-xs transition cursor-pointer">🗑️</button>
       </div>
     </div>`).join('');
+
+  // Ringkasan total
+  const totalUnit  = barang.reduce((s,b) => s + b.stok, 0);
+  const totalNilai = barang.reduce((s,b) => s + b.stok * b.hargaBeli, 0);
+  const jmlHabis   = barang.filter(b => b.stok === 0).length;
+  const jmlKritis  = barang.filter(b => b.stok > 0 && b.stok <= 3).length;
+  const ring = document.getElementById('ringkasanStok');
+  if (ring) ring.innerHTML = `
+    <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
+      <p class="text-white/70 text-xs uppercase tracking-wider mb-1">Total Jenis</p>
+      <p class="text-white text-xl font-bold">${barang.length}</p>
+    </div>
+    <div class="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
+      <p class="text-white/70 text-xs uppercase tracking-wider mb-1">Total Unit</p>
+      <p class="text-white text-xl font-bold">${totalUnit}</p>
+    </div>
+    <div class="bg-emerald-500/20 border border-emerald-400/30 rounded-2xl p-4 text-center">
+      <p class="text-emerald-300/70 text-xs uppercase tracking-wider mb-1">Nilai Stok</p>
+      <p class="text-emerald-300 text-xl font-bold">Rp ${totalNilai.toLocaleString('id-ID')}</p>
+    </div>
+    <div class="bg-red-500/20 border border-red-400/30 rounded-2xl p-4 text-center">
+      <p class="text-red-300/70 text-xs uppercase tracking-wider mb-1">Habis / Kritis</p>
+      <p class="text-red-300 text-xl font-bold">${jmlHabis} / <span class="text-yellow-300">${jmlKritis}</span></p>
+    </div>`;
 }
 
 function renderJasa() {
