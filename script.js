@@ -5,6 +5,7 @@ let modalState  = { index: null, tipe: null };
 let keranjang   = [];
 let periodeAktif = 'hari';
 let namaBengkel = 'Bengkel';
+let filterHabisKritisAktif = false;
 
 // ── Format Angka ──────────────────────────────────────────────────────
 function fmt(n) {
@@ -592,6 +593,28 @@ function renderDashboard() {
   document.getElementById('dbTopBarangEmpty').style.display = topList.length ? 'none' : 'block';
 }
 
+// ── Toggle Filter Habis/Kritis ──────────────────────────────────────
+function toggleFilterHabisKritis() {
+  filterHabisKritisAktif = !filterHabisKritisAktif;
+  const card = document.getElementById('cardHabisKritis');
+  if (card) {
+    if (filterHabisKritisAktif) {
+      card.classList.add('ring-2', 'ring-red-400', 'bg-red-500/40');
+      const hint = card.querySelector('p:last-child');
+      if (hint) hint.textContent = 'Ketuk untuk reset';
+      // Pindah ke tab stok kalau belum di sana
+      if (document.getElementById('panelStok')?.classList.contains('hidden')) {
+        switchTab('stok');
+      }
+    } else {
+      card.classList.remove('ring-2', 'ring-red-400', 'bg-red-500/40');
+      const hint = card.querySelector('p:last-child');
+      if (hint) hint.textContent = 'Ketuk untuk filter';
+    }
+  }
+  renderTable();
+}
+
 function renderTable() {
   const tbody  = document.getElementById('listBarang');
   const mobile = document.getElementById('listBarangMobile');
@@ -606,9 +629,13 @@ function renderTable() {
   if (cari) filtered = filtered.filter(item => item.nama.toLowerCase().includes(cari));
 
   // Filter status
-  if (status === 'habis')   filtered = filtered.filter(item => item.stok === 0);
-  if (status === 'kritis')  filtered = filtered.filter(item => item.stok > 0 && item.stok <= 3);
-  if (status === 'aman')    filtered = filtered.filter(item => item.stok > 3);
+  if (filterHabisKritisAktif) {
+    filtered = filtered.filter(item => item.stok <= 3);
+  } else {
+    if (status === 'habis')   filtered = filtered.filter(item => item.stok === 0);
+    if (status === 'kritis')  filtered = filtered.filter(item => item.stok > 0 && item.stok <= 3);
+    if (status === 'aman')    filtered = filtered.filter(item => item.stok > 3);
+  }
 
   // Sort
   if (sort === 'nama-asc')    filtered.sort((a,b) => a.nama.localeCompare(b.nama));
@@ -697,10 +724,13 @@ function renderTable() {
       <p class="text-emerald-300 text-2xl font-bold truncate" title="${fmtFull(totalNilai)}">${fmtRp(totalNilai)}</p>
       <p class="text-emerald-300/50 text-xs mt-1 truncate">${fmtFull(totalNilai)}</p>
     </div>
-    <div class="bg-red-500/20 border border-red-400/30 rounded-2xl p-4 text-center min-w-0">
+    <div id="cardHabisKritis" onclick="toggleFilterHabisKritis()"
+      class="bg-red-500/20 border border-red-400/30 rounded-2xl p-4 text-center min-w-0 cursor-pointer transition hover:bg-red-500/30 active:scale-95">
       <p class="text-red-300/70 text-xs uppercase tracking-wider mb-1 truncate">Habis / Kritis</p>
       <p class="text-red-300 text-2xl font-bold">${jmlHabis} / <span class="text-yellow-300">${jmlKritis}</span></p>
       <p class="text-white/50 text-xs mt-1">barang</p>
+      <p class="text-red-300/50 text-xs mt-1">Ketuk untuk filter</p>
+    </div>
     </div>`;
 }
 
