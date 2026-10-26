@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stok Bengkel</title>
+  <script>
+    if (sessionStorage.getItem('bengkel_authenticated') !== 'true') {
+      window.location.replace('login.html');
+    }
+    function logoutApp() {
+      sessionStorage.removeItem('bengkel_authenticated');
+      window.location.replace('login.html');
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
     @media print {
@@ -114,6 +123,10 @@
           <span>📥 <span id="sumUnitMasuk" class="text-emerald-300 font-bold">0</span> masuk</span>
           <span>📤 <span id="sumUnitKeluar" class="text-red-300 font-bold">0</span> keluar</span>
         </div>
+        <button onclick="logoutApp()"
+          class="rounded-xl border border-white/20 px-3 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-900/30 cursor-pointer">
+          🚪 Keluar
+        </button>
       </header>
 
       <!-- Page content -->

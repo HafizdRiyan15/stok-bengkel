@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Stok Bengkel</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-950 to-slate-900 font-sans flex items-center justify-center p-4">
+  <main class="w-full max-w-md rounded-3xl border border-cyan-800/50 bg-slate-900/90 p-8 shadow-2xl">
+    <div class="mb-8 text-center">
+      <span class="text-5xl" aria-hidden="true">🔧</span>
+      <h1 class="mt-4 text-2xl font-bold text-white">Stok Bengkel</h1>
+      <p class="mt-2 text-sm text-white/60">Masuk untuk mengelola inventaris bengkel</p>
+    </div>
+
+    <form id="loginForm" class="space-y-5">
+      <div>
+        <label for="username" class="mb-2 block text-sm font-medium text-white/80">Username</label>
+        <input id="username" name="username" type="text" autocomplete="username" required
+          class="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white outline-none transition placeholder:text-white/40 focus:border-cyan-400"
+          placeholder="Masukkan username">
+      </div>
+      <div>
+        <label for="password" class="mb-2 block text-sm font-medium text-white/80">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required
+          class="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white outline-none transition placeholder:text-white/40 focus:border-cyan-400"
+          placeholder="Masukkan password">
+      </div>
+      <p id="loginError" class="hidden text-sm text-red-300" role="alert" aria-live="polite"></p>
+      <button type="submit"
+        class="w-full rounded-xl bg-cyan-400 py-3 font-bold text-slate-900 transition hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-900">
+        Masuk
+      </button>
+    </form>
+  </main>
+
+  <script>
+    const USERNAME = 'admin';
+    const PASSWORD = 'admin123';
+
+    if (sessionStorage.getItem('bengkel_authenticated') === 'true') {
+      window.location.replace('index.html');
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const error = document.getElementById('loginError');
+
+      if (username === USERNAME && password === PASSWORD) {
+        sessionStorage.setItem('bengkel_authenticated', 'true');
+        window.location.replace('index.html');
+        return;
+      }
+
+      error.textContent = 'Username atau password salah.';
+      error.classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
