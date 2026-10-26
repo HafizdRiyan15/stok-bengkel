@@ -5,9 +5,12 @@ Website sederhana untuk mengelola stok sparepart bengkel motor.
 ## Fitur
 - Login untuk mengakses aplikasi
 - Tambah barang
+- Tambah foto barang saat input dan ubah foto dari menu edit
 - Update stok
 - Hapus barang
 - Penyimpanan data menggunakan localStorage
+
+Foto JPG, PNG, dan WebP akan dikompres dan disimpan bersama data barang di browser. Foto juga ikut tersimpan dalam file backup saat Export.
 
 ## Login
 - Username: `admin`

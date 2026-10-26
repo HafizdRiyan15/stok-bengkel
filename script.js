@@ -6,6 +6,67 @@ let keranjang   = [];
 let periodeAktif = 'hari';
 let namaBengkel = 'Bengkel';
 let filterHabisKritisAktif = false;
+let gambarEditDihapus = false;
+let gambarEditBaru = null;
+
+const TIPE_GAMBAR_DIDUKUNG = ['image/jpeg', 'image/png', 'image/webp'];
+
+function gambarBarangMarkup(gambar, className = 'h-12 w-12') {
+  const valid = typeof gambar === 'string' &&
+    /^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(gambar);
+  if (!valid) {
+    return `<div class="${className} flex shrink-0 items-center justify-center rounded-xl bg-white/10 text-xl" aria-label="Belum ada foto">📦</div>`;
+  }
+  return `<img src="${gambar}" alt="Foto barang" loading="lazy" class="${className} shrink-0 rounded-xl bg-white/10 object-cover">`;
+}
+
+function kompresGambar(file) {
+  if (!TIPE_GAMBAR_DIDUKUNG.includes(file.type)) {
+    return Promise.reject(new Error('Pilih gambar JPG, PNG, atau WebP.'));
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    return Promise.reject(new Error('Ukuran gambar maksimal 10 MB.'));
+  }
+
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      try {
+        const scale = Math.min(1, 700 / Math.max(image.width, image.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(image.width * scale));
+        canvas.height = Math.max(1, Math.round(image.height * scale));
+        const context = canvas.getContext('2d');
+        if (!context) {
+          reject(new Error('Browser tidak dapat memproses gambar ini.'));
+          return;
+        }
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(blob => {
+          if (!blob) {
+            reject(new Error('Gagal memproses gambar.'));
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error('Gagal membaca gambar.'));
+          reader.readAsDataURL(blob);
+        }, 'image/jpeg', 0.75);
+      } catch (error) {
+        reject(error);
+      }
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('File gambar tidak dapat dibuka.'));
+    };
+    image.src = url;
+  });
+}
 
 // ── Format Angka ──────────────────────────────────────────────────────
 function fmt(n) {
@@ -19,10 +80,15 @@ function fmtFull(n){ return 'Rp ' + n.toLocaleString('id-ID'); }
 
 // ── Persistensi localStorage ─────────────────────────────────────────
 function simpanData() {
-  localStorage.setItem('bengkel_barang',  JSON.stringify(barang));
-  localStorage.setItem('bengkel_jasa',    JSON.stringify(jasa));
-  localStorage.setItem('bengkel_riwayat', JSON.stringify(riwayat));
-  localStorage.setItem('bengkel_nama',    namaBengkel);
+  try {
+    localStorage.setItem('bengkel_barang',  JSON.stringify(barang));
+    localStorage.setItem('bengkel_jasa',    JSON.stringify(jasa));
+    localStorage.setItem('bengkel_riwayat', JSON.stringify(riwayat));
+    localStorage.setItem('bengkel_nama',    namaBengkel);
+  } catch (error) {
+    if (error.name !== 'QuotaExceededError') throw error;
+    alert('Penyimpanan browser penuh. Hapus beberapa foto barang atau ekspor backup sebelum melanjutkan.');
+  }
 }
 
 function muatData() {
@@ -76,7 +142,7 @@ function toggleKetLainnya() {
   document.getElementById('ketLainnyaWrap').classList.toggle('hidden', val !== 'Lainnya');
 }
 
-function tambahBarang() {
+async function tambahBarang() {
   const nama      = document.getElementById('nama').value.trim();
   const stokAwal  = parseInt(document.getElementById('stokAwal').value) || 0;
   const hargaBeli = parseInt(document.getElementById('hargaBeli').value);
@@ -93,12 +159,24 @@ function tambahBarang() {
     alert(`Barang "${nama}" sudah ada!`); return;
   }
 
-  barang.push({ nama, stok: stokAwal, hargaBeli, hargaJual });
+  let gambar = null;
+  const fileGambar = document.getElementById('gambarBarang').files[0];
+  if (fileGambar) {
+    try {
+      gambar = await kompresGambar(fileGambar);
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
+  }
+
+  barang.push({ nama, stok: stokAwal, hargaBeli, hargaJual, gambar });
   if (stokAwal > 0) {
     riwayat.unshift({ waktu: now(), nama, tipe: 'masuk', jumlah: stokAwal,
       hargaSatuan: hargaBeli, totalHarga: stokAwal * hargaBeli, keterangan });
   }
   ['nama','stokAwal','hargaBeli','hargaJual','ketLainnya'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('gambarBarang').value = '';
   document.getElementById('kategoriMasuk').value = 'Stok awal';
   document.getElementById('ketLainnyaWrap').classList.add('hidden');
   render();
@@ -121,15 +199,37 @@ function konfirmasiHapus() {
 // ── Edit Barang ─────────────────────────────────────────────────────
 function openEdit(i) {
   const item = barang[i];
+  gambarEditDihapus = false;
+  gambarEditBaru = null;
   document.getElementById('editIndex').value     = i;
   document.getElementById('editNama').value      = item.nama;
   document.getElementById('editStok').value      = item.stok;
   document.getElementById('editHargaBeli').value = item.hargaBeli;
   document.getElementById('editHargaJual').value = item.hargaJual;
+  document.getElementById('editGambarBarang').value = '';
+  document.getElementById('editGambarPreview').innerHTML = gambarBarangMarkup(item.gambar, 'h-20 w-20');
   document.getElementById('modalEdit').classList.remove('hidden');
   document.getElementById('editNama').focus();
 }
 function closeEdit() { document.getElementById('modalEdit').classList.add('hidden'); }
+function hapusGambarEdit() {
+  gambarEditDihapus = true;
+  gambarEditBaru = null;
+  document.getElementById('editGambarBarang').value = '';
+  document.getElementById('editGambarPreview').innerHTML = gambarBarangMarkup(null, 'h-20 w-20');
+}
+async function pilihGambarEdit(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    gambarEditBaru = await kompresGambar(file);
+    gambarEditDihapus = false;
+    document.getElementById('editGambarPreview').innerHTML = gambarBarangMarkup(gambarEditBaru, 'h-20 w-20');
+  } catch (error) {
+    event.target.value = '';
+    alert(error.message);
+  }
+}
 function simpanEdit() {
   const i         = parseInt(document.getElementById('editIndex').value);
   const nama      = document.getElementById('editNama').value.trim();
@@ -144,8 +244,9 @@ function simpanEdit() {
   if (barang.some((b, idx) => idx !== i && b.nama.toLowerCase() === nama.toLowerCase())) {
     alert(`Barang "${nama}" sudah ada!`); return;
   }
+  const gambar = gambarEditBaru || (gambarEditDihapus ? null : barang[i].gambar || null);
   const namaLama = barang[i].nama;
-  barang[i] = { ...barang[i], nama, stok, hargaBeli, hargaJual };
+  barang[i] = { ...barang[i], nama, stok, hargaBeli, hargaJual, gambar };
   if (namaLama !== nama) riwayat.forEach(r => { if (r.nama === namaLama) r.nama = nama; });
   closeEdit(); render();
 }
@@ -285,9 +386,12 @@ function renderKasirPilih() {
   list.innerHTML = filtered.map(b => `
     <div class="flex items-center justify-between px-4 py-3 hover:bg-white/10 transition cursor-pointer"
          onclick="tambahKeranjang('barang',${b.i})">
-      <div>
+      <div class="flex min-w-0 items-center gap-3">
+        ${gambarBarangMarkup(b.gambar, 'h-10 w-10')}
+        <div class="min-w-0">
         <p class="text-white text-sm font-medium">${b.nama}</p>
         <p class="text-white/40 text-xs">Stok: ${b.stok} • Rp ${b.hargaJual.toLocaleString('id-ID')}</p>
+        </div>
       </div>
       <span class="text-emerald-300 text-lg font-bold">+</span>
     </div>`).join('');
@@ -662,7 +766,9 @@ function renderTable() {
   // Desktop tabel rows
   tbody.innerHTML = filtered.map((item) => `
     <tr class="hover:bg-white/10 transition">
-      <td class="px-4 py-3 font-medium">${item.nama}</td>
+      <td class="px-4 py-3 font-medium">
+        <div class="flex items-center gap-3">${gambarBarangMarkup(item.gambar)}<span>${item.nama}</span></div>
+      </td>
       <td class="px-4 py-3 text-center">
         <span class="px-3 py-1 rounded-full text-xs font-bold ${item.stok===0?'bg-red-500/30 text-red-300':item.stok<=3?'bg-yellow-500/30 text-yellow-300':'bg-white/20 text-white'}">${item.stok}</span>
       </td>
@@ -687,7 +793,7 @@ function renderTable() {
   mobile.innerHTML = filtered.map((item) => `
     <div class="p-4 space-y-3">
       <div class="flex items-center justify-between">
-        <p class="text-white font-semibold">${item.nama}</p>
+        <div class="flex min-w-0 items-center gap-3">${gambarBarangMarkup(item.gambar, 'h-14 w-14')}<p class="truncate text-white font-semibold">${item.nama}</p></div>
         <span class="px-3 py-1 rounded-full text-xs font-bold ${item.stok===0?'bg-red-500/30 text-red-300':item.stok<=3?'bg-yellow-500/30 text-yellow-300':'bg-white/20 text-white'}">${item.stok} unit</span>
       </div>
       <div class="grid grid-cols-3 gap-2 text-xs">
@@ -1044,4 +1150,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('modalJumlah').addEventListener('input', hitungModalTotal);
   document.getElementById('modalHarga').addEventListener('input', hitungModalTotal);
+  document.getElementById('editGambarBarang').addEventListener('change', pilihGambarEdit);
 });
